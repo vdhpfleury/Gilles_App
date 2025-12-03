@@ -119,17 +119,6 @@ if st.session_state.menu_selection == "Accueil":
     col1, col2 = st.columns([1, 3])
 
     with col1 : 
-        subcol1, subcol2  = st.columns(2)
-        with subcol1 : 
-            st.subheader("Contacter")
-            st.write("remplir le formulaire ici")
-            if st.button("Contacter"):
-                st.session_state.menu_selection = "Contact"
-                st.rerun()
-        with subcol2 : 
-            st.subheader("Suivre")
-            st.write("*lien reseau*")
-            
         st.subheader("Actualités")
         st.write("...")
     with col2 : 
@@ -913,11 +902,13 @@ if st.session_state.menu_selection == "Accueil":
 
     with col1 : 
         st.video("https://www.youtube.com/watch?v=Qf6NSbwm6iw")
+        st.write("*France 3*")
     with col2 :
         st.video("https://www.youtube.com/watch?v=Uz1VxVH-iyY")
+        st.write("*Université Côte d'Azur*")
     with col3 :
         st.video("https://www.youtube.com/watch?v=gvhg9zYuwpc")
-
+        st.write("*Pure Ocean*")
 
 # PAGE CONTACT
 elif st.session_state.menu_selection == "Contact":
