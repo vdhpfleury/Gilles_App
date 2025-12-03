@@ -1020,9 +1020,9 @@ col1, col2, col3 = st.columns(3)
 with col1 : 
     st.video("https://www.youtube.com/watch?v=Qf6NSbwm6iw")
 with col2 :
-    b=0
+    st.video("https://www.youtube.com/watch?v=Uz1VxVH-iyY")
 with col3 :
-    a=0
+    st.video("https://www.youtube.com/watch?v=gvhg9zYuwpc")
 
 
 st.markdown("---")
