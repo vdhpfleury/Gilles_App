@@ -1014,6 +1014,18 @@ elif st.session_state.menu_selection == "Qui suis-je ? +CV":
     
 # Footer
 st.markdown("---")
+st.header("Quelques interview")
+col1, col2, col3 = st.columns(3)
+
+with col1 : 
+    st.video("https://www.youtube.com/watch?v=Qf6NSbwm6iw")
+with col2 :
+    b=0
+with col3 :
+    a=0
+
+
+st.markdown("---")
 col1, col2, col3 = st.columns(3)
 with col1:
     st.markdown("**© 2024 Gilles Gambini**")
