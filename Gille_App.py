@@ -69,6 +69,15 @@ st.markdown("""
 </style>
 """, unsafe_allow_html=True)
 
+def img_to_base64(path):
+    with open(path, "rb") as f:
+        return base64.b64encode(f.read()).decode()
+
+fb = img_to_base64("Photo/RESEAU/facebook.png")
+li = img_to_base64("Photo/RESEAU/linkedIn.png")
+ig = img_to_base64("Photo/RESEAU/Instagram.png")
+
+
 # Menu de navigation
 with st.sidebar:
     selected = option_menu(
@@ -90,12 +99,33 @@ if st.session_state.menu_selection == "Accueil":
 
     with col2 :
         st.markdown('<h1 class="main-header">Gilles Gambini</h1>', unsafe_allow_html=True)
-        st.markdown('<p class="sub-header">Apnéiste professionnel • Biologiste marin • Plongeur scientifique • Photographe</p>', unsafe_allow_html=True)
+        st.markdown('<p class="sub-header">Apnéiste professionnel • Instructeur • Biologiste marin • Plongeur scientifique • Scaphandrier • Photographe </p>', unsafe_allow_html=True)
 
-        st.markdown('<h1 class="main-header">Certifications</h1>', unsafe_allow_html=True)
-        st.markdown('<p class="sub-header">DEJEPS • Plongeur 2A, 3B • Recycleur Hypoxique</p>', unsafe_allow_html=True)
 
-        st.markdown('<h1 class="main-header">📋 Services</h1>', unsafe_allow_html=True)
+        #st.markdown('<p class="sub-header"> Suivez moi sur mes réseaux </p>', unsafe_allow_html=True)
+        #st.markdown(f"""
+        #<div style="display: flex; justify-content: center; gap: 20px;">
+        #    <p>Suivez moi sur mes réseaux</p>
+        #</div>
+        #""", unsafe_allow_html=True)
+
+        st.markdown(f"""
+        <div style="display: flex; justify-content: center; gap: 20px;">
+        <a href="https://www.facebook.com/share/1BhzPeJTXS/" target="_blank">
+            <img src="data:image/png;base64,{fb}" width="40">
+        </a>
+        <a href="https://www.linkedin.com/in/gilles-gambini-5298a287/" target="_blank">
+            <img src="data:image/png;base64,{li}" width="40">
+        </a>
+        <a href="https://www.instagram.com/gillesgambini/" target="_blank">
+            <img src="data:image/png;base64,{ig}" width="40">
+        </a>
+        </div>
+        """, unsafe_allow_html=True)
+
+
+        #st.markdown('<h1 class="main-header">📋 Services</h1>', unsafe_allow_html=True)
+        st.markdown('<h1 class="main-header">Mes Services</h1>', unsafe_allow_html=True)
     
         services_data = [
             ("Mentoring", "Accompagnement personnalisé • Carrière marine • Performance"),
@@ -114,8 +144,10 @@ if st.session_state.menu_selection == "Accueil":
                 with col:
                     st.markdown(f"**{titre}**")
                     st.caption(description)
+        st.markdown('<p class="sub-header">le details des services est disponible plus bas sur cette page</p>', unsafe_allow_html=True)
+       
+       
 
-    
     col1, col2 = st.columns([1, 3])
 
     with col1 : 
@@ -161,13 +193,13 @@ if st.session_state.menu_selection == "Accueil":
             st.markdown("#### 🌍 Expérience terrain")
             st.write("Forgée lors d'expéditions, de tournages et de missions à travers le monde.")
         
-        st.markdown("---")
+        #st.markdown("---")
         
         # Formules de mentoring
         st.header("📋 Formules de Mentoring")
         
         # Formule 1
-        with st.expander("🎯 Mentoring individuel « Exploration & Performance »", expanded=True):
+        with st.expander("🎯 Mentoring individuel « Exploration & Performance »", expanded=False):
             col1, col2 = st.columns([2, 1])
             with col1:
                 st.markdown("""
@@ -241,7 +273,7 @@ if st.session_state.menu_selection == "Accueil":
                 st.markdown('<p class="price-tag">150 € / mois</p>', unsafe_allow_html=True)
                 st.button("Candidater", key="mentoring4")
         
-        st.markdown("---")
+        #st.markdown("---")
         
         st.markdown("### 🎯 Pourquoi ce mentoring est différent")
         col1, col2 = st.columns(2)
@@ -896,7 +928,91 @@ if st.session_state.menu_selection == "Accueil":
         ✓ Mises à jour gratuites
         """)
     
+    
+
+
     st.markdown("---")
+    st.title("📧 Contact")
+    
+    st.write("""
+    Pour toute demande d'information, réservation ou projet personnalisé, n'hésitez pas à me contacter.
+    
+    Je réponds généralement sous 48h.
+    """)
+    
+    col1, col2 = st.columns([2, 1])
+    
+    with col1:
+        st.markdown("### 📝 Formulaire de contact")
+        
+        with st.form("contact_form"):
+            nom = st.text_input("Nom complet *")
+            email = st.text_input("Email *")
+            telephone = st.text_input("Téléphone")
+            
+            sujet = st.selectbox(
+                "Sujet de votre demande *",
+                [
+                    "Mentoring",
+                    "Coaching Apnée",
+                    "Conférence",
+                    "Stage",
+                    "Services Hyperbare",
+                    "Banque d'images",
+                    "Cours en ligne",
+                    "Autre"
+                ]
+            )
+            
+            message = st.text_area("Votre message *", height=200)
+            
+            col_a, col_b = st.columns([1, 3])
+            with col_a:
+                submitted = st.form_submit_button("Envoyer", use_container_width=True)
+            
+            if submitted:
+                if nom and email and message:
+                    st.success("✅ Message envoyé avec succès ! Je vous répondrai dans les plus brefs délais.")
+                else:
+                    st.error("⚠️ Veuillez remplir tous les champs obligatoires (*)")
+    
+    with col2:
+        st.markdown("### 📞 Coordonnées")
+        st.markdown("""
+        **Email :**  
+        gilles.gambini@hotmail.fr
+        
+        **Localisation :**  
+        Nice, Côte d'Azur, France
+        
+        **Disponibilité :**  
+        Interventions en France et à l'international
+        """)
+        
+        st.markdown("---")
+        col1, col2 = st.columns(2)
+        with col1 : st.markdown("### 🌐 Suivez-moi")
+        with col2 : 
+            st.markdown(f"""
+            <div style="display: flex; justify-content: center; gap: 20px;">
+            <a href="https://www.facebook.com/share/1BhzPeJTXS/" target="_blank">
+                <img src="data:image/png;base64,{fb}" width="40">
+            </a>
+            <a href="https://www.linkedin.com/in/gilles-gambini-5298a287/" target="_blank">
+                <img src="data:image/png;base64,{li}" width="40">
+            </a>
+            <a href="https://www.instagram.com/gillesgambini/" target="_blank">
+                <img src="data:image/png;base64,{ig}" width="40">
+            </a>
+            </div>
+            """, unsafe_allow_html=True)
+        
+        st.info("📸 **Photo profil**")
+        st.image("https://via.placeholder.com/300x400/1e3a8a/ffffff?text=Photo+Profil", use_container_width=True)
+    
+    
+    st.markdown("---")
+
     st.header("Quelques interview")
     col1, col2, col3 = st.columns(3)
 
@@ -913,7 +1029,7 @@ if st.session_state.menu_selection == "Accueil":
 # PAGE CONTACT
 elif st.session_state.menu_selection == "Contact":
     st.title("📧 Contact")
-    
+
     st.write("""
     Pour toute demande d'information, réservation ou projet personnalisé, n'hésitez pas à me contacter.
     
@@ -973,15 +1089,39 @@ elif st.session_state.menu_selection == "Contact":
         
         st.markdown("---")
         
-        st.markdown("### 🌐 Suivez-moi")
-        st.markdown("""
-        [Instagram](#) • [LinkedIn](#) • [Facebook](#)
-        """)
+        st.markdown("---")
+        col1, col2 = st.columns(2)
+        with col1 : st.markdown("### 🌐 Suivez-moi")
+        with col2 : 
+            st.markdown(f"""
+            <div style="display: flex; justify-content: center; gap: 20px;">
+            <a href="https://www.facebook.com/share/1BhzPeJTXS/" target="_blank">
+                <img src="data:image/png;base64,{fb}" width="40">
+            </a>
+            <a href="https://www.linkedin.com/in/gilles-gambini-5298a287/" target="_blank">
+                <img src="data:image/png;base64,{li}" width="40">
+            </a>
+            <a href="https://www.instagram.com/gillesgambini/" target="_blank">
+                <img src="data:image/png;base64,{ig}" width="40">
+            </a>
+            </div>
+            """, unsafe_allow_html=True)
         
         st.info("📸 **Photo profil**")
         st.image("https://via.placeholder.com/300x400/1e3a8a/ffffff?text=Photo+Profil", use_container_width=True)
 
 elif st.session_state.menu_selection == "Qui suis-je ? +CV":
+    col1, col2 = st.columns([1,3])
+    with col1 : 
+        st.image("Photo/profil_01.JPG", caption="Profil", use_container_width=True)
+
+    with col2 :
+        st.markdown('<h1 class="main-header">Gilles Gambini</h1>', unsafe_allow_html=True)
+        st.markdown('<p class="sub-header">Apnéiste professionnel • Biologiste marin • Plongeur scientifique • Photographe</p>', unsafe_allow_html=True)
+
+        st.markdown('<h1 class="main-header">Certifications</h1>', unsafe_allow_html=True)
+        st.markdown('<p class="sub-header">DEJEPS • Plongeur 2A, 3B • Recycleur Hypoxique</p>', unsafe_allow_html=True)
+
     st.write("""
     C'est ce qui guide chacun de mes coups de palme.
     
