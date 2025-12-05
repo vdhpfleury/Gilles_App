@@ -249,7 +249,7 @@ if st.session_state.menu_selection == "Accueil":
                 une carrière marine ou scientifique.
                 """)
             with col2:
-                st.markdown('<p class="price-tag">100 € / mois</p>', unsafe_allow_html=True)
+                st.markdown('<p class="price-tag">60 € / mois</p>', unsafe_allow_html=True)
                 st.button("Débuter mon parcours", key="mentoring3")
         
         # Formule 4
