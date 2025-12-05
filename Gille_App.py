@@ -231,7 +231,7 @@ if st.session_state.menu_selection == "Accueil":
                 ✓ Suivi collectif + espace d'échange privé
                 """)
             with col2:
-                st.markdown('<p class="price-tag">350 € / mois</p>', unsafe_allow_html=True)
+                st.markdown('<p class="price-tag">60 € / mois</p>', unsafe_allow_html=True)
                 st.button("Rejoindre un groupe", key="mentoring2")
         
         # Formule 3
@@ -241,6 +241,8 @@ if st.session_state.menu_selection == "Accueil":
                 st.markdown("""
                 **Pour construire un parcours professionnel aligné avec vos valeurs et votre passion pour l'océan.**
                 
+                Ce mentoring offre un accompagnement individuel et sur mesure de vos besoins grâce à : 
+
                 ✓ 1 séance d'1h/mois : orientation, stratégie, CV, préparation à l'emploi ou à la mission  
                 ✓ Accompagnement sur les choix de carrière, stages, formations et projets scientifiques, réseau  
                 ✓ Retours d'expérience et conseils concrets issus du terrain
@@ -249,7 +251,7 @@ if st.session_state.menu_selection == "Accueil":
                 une carrière marine ou scientifique.
                 """)
             with col2:
-                st.markdown('<p class="price-tag">60 € / mois</p>', unsafe_allow_html=True)
+                st.markdown('<p class="price-tag">100 € / mois</p>', unsafe_allow_html=True)
                 st.button("Débuter mon parcours", key="mentoring3")
         
         # Formule 4
