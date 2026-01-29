@@ -19,6 +19,15 @@ if 'images_ICE' not in st.session_state:
     preload_images("Photo/ICE")
     st.session_state.images_ICE = True
 
+if 'images_APNEE' not in st.session_state:
+    preload_images("Photo/APNEE")
+    st.session_state.images_APNEE = True
+
+if 'images_ACC' not in st.session_state:
+    preload_images("Photo/CARR_ACCEUIL")
+    st.session_state.images_ACC = True
+
+
 # CSS personnalisé
 st.markdown("""
 <style>
@@ -154,7 +163,7 @@ if st.session_state.menu_selection == "Accueil":
         st.subheader("Actualités")
         st.write("...")
     with col2 : 
-        carrousel("Photo/ICE", height=500, duration=3)
+        carrousel("Photo/CARR_ACCEUIL", height=500, duration=3)
 
         
     # Bio
@@ -178,8 +187,10 @@ if st.session_state.menu_selection == "Accueil":
             """)
 
         with col2 : 
-            st.info("📸 **ESPACE IMAGE HEADER** - Image inspirante de mentorat/exploration")
-            st.image("https://via.placeholder.com/1200x400/1e3a8a/ffffff?text=Mentoring+Header", use_container_width=True)
+            #st.image("Photo/APNEE/img_apnee_16.jpg", use_container_width=False)
+
+            carrousel("Photo/APNEE", height=300, duration=3)
+
                     
         
         col1, col2, col3 = st.columns(3)
@@ -226,7 +237,7 @@ if st.session_state.menu_selection == "Accueil":
                 **Apprenez, échangez et progressez ensemble en fonction de vos objectifs (groupes par thématiques).**
                 
                 ✓ Petits groupes (3 à 6 personnes)  
-                ✓ 1 visio hebdomadaire (1h30)  
+                ✓ 1 visio mensuel (1h30)  
                 ✓ Ressources exclusives (PDF, vidéos, fiches techniques)  
                 ✓ Suivi collectif + espace d'échange privé
                 """)
@@ -286,16 +297,11 @@ if st.session_state.menu_selection == "Accueil":
             st.write("✓ Écoute, rigueur et accompagnement humain")
             st.write("✓ Objectif : autonomie, progression, confiance")
         
-        st.info("📸 **ESPACE IMAGE** - Photo de mentorat en action ou d'expédition")
+        #st.info("📸 **ESPACE IMAGE** - Photo de mentorat en action ou d'expédition")
 
     with tab_Coaching : 
         st.title("💙 Coaching Apnée : Suivi personnalisé")
         col1, col2 = st.columns([2, 3])
-        with col2 : 
-            st.info("📸 **ESPACE IMAGE HEADER** - Image d'apnée profonde")
-            st.image("https://via.placeholder.com/1200x400/0ea5e9/ffffff?text=Coaching+Apnée", use_container_width=True)
-        
-
         with col1 :
             st.subheader("Progressez à votre rythme, avec un encadrement sur mesure")
                 
@@ -307,9 +313,7 @@ if st.session_state.menu_selection == "Accueil":
             
             **L'objectif : vous aider à progresser durablement, sans surentraînement ni perte de motivation.**
             """)
-        
-        col1, col2 = st.columns([2, 1])
-        with col1:
+        with col2 : 
             st.markdown("### 🎯 Le concept")
             st.write("""
             Une approche simple, efficace et personnalisée. Une séance par mois, des exercices ciblés, et un suivi continu.
@@ -321,30 +325,25 @@ if st.session_state.menu_selection == "Accueil":
             ✓ Un plan de progression clair ajusté à vos capacités et à votre agenda  
             ✓ Un échange direct (mail ou message) pour toute question entre deux sessions
             """)
+        col1, col2 = st.columns([2, 1])
+        with col1:
+            st.markdown("### 👥 Pour qui ?")
+            st.write("🌊 Apnéistes débutants souhaitant progresser sereinement")
+            st.write("📈 Pratiquants confirmés cherchant à franchir un cap ou progresser")
+            st.write("🏆 Apnéistes de haut niveau désirant préparer des compétitions")
+            st.write("🧘 Sportifs voulant travailler la respiration et la gestion mentale")
+            st.write("📸 Photographes sous-marins souhaitant améliorer leur aisance sous l'eau")
         with col2:
-            st.markdown('<div class="service-card">', unsafe_allow_html=True)
-            st.markdown('<p class="price-tag">100 € / mois</p>', unsafe_allow_html=True)
+            st.markdown("### Contenue et tarifs")
+            #st.markdown('<div class="service-card">', unsafe_allow_html=True)
             st.write("**Sans engagement**")
             st.write("✓ 1 visio/appel mensuel")
             st.write("✓ Bloc d'exercices personnalisé")
             st.write("✓ Suivi et adaptation mensuelle")
+            st.markdown('<p class="price-tag">100 € / mois</p>', unsafe_allow_html=True)
             st.button("Réserver mon appel découverte", key="coaching")
-            st.markdown('</div>', unsafe_allow_html=True)
         
-        st.markdown("---")
-        
-        st.markdown("### 👥 Pour qui ?")
-        col1, col2 = st.columns(2)
-        with col1:
-            st.write("🌊 Apnéistes débutants souhaitant progresser sereinement")
-            st.write("📈 Pratiquants confirmés cherchant à franchir un cap ou progresser")
-            st.write("🏆 Apnéistes de haut niveau désirant préparer des compétitions")
-        with col2:
-            st.write("🧘 Sportifs voulant travailler la respiration et la gestion mentale")
-            st.write("📸 Photographes sous-marins souhaitant améliorer leur aisance sous l'eau")
-        
-        st.markdown("---")
-        
+
         st.markdown("### ⭐ Pourquoi ce coaching est différent")
         col1, col2 = st.columns(2)
         with col1:
@@ -356,11 +355,23 @@ if st.session_state.menu_selection == "Accueil":
 
     with tab_Conferences : 
         st.title("🎤 Conférences - Science, Océan & Performance Humaine")
-        st.subheader("Explorer, inspirer, reconnecter")
 
-        col1, col2 = st.columns([2,3])
+        col1, col2 = st.columns([2, 3])
 
         with col1 : 
+            st.write("### 🎯 Thématiques clés")
+            st.write("""
+            • La physiologie de l'extrême : ce que l'apnée nous apprend sur le corps humain  
+            • Explorer et préserver : science et aventure au service de la connaissance  
+            • Le souffle comme outil de performance et d'équilibre  
+            • Leadership et gestion de mission en milieu extrême  
+            • L'océan comme source d'inspiration et d'humilité
+            """)
+
+
+        
+        with col2 : 
+            st.write("### Explorer, inspirer, reconnecter")
             st.write("""
             À travers mes expériences d'apnéiste professionnel, de biologiste marin et de plongeur scientifique, je partage 
             une vision singulière du monde : celle d'un homme qui explore les profondeurs pour mieux comprendre la vie et ses limites.
@@ -371,15 +382,11 @@ if st.session_state.menu_selection == "Accueil":
             et sensorielle, à la croisée de la science, du sport et de l'aventure.
             """)
         
-        with col2 : 
-            st.info("📸 **ESPACE IMAGE HEADER** - Photo de conférence ou d'expédition")
-            st.image("https://via.placeholder.com/1200x400/1e3a8a/ffffff?text=Conférences", use_container_width=True)
         
         
         
         
-        
-        st.markdown("### 🎯 Une approche unique")
+        st.markdown("### Une approche unique")
         st.write("""
         Alliant rigueur scientifique, sensibilité artistique et expérience de terrain, mes interventions s'adressent à tous les publics :
         
@@ -471,14 +478,7 @@ if st.session_state.menu_selection == "Accueil":
             st.write("📸 Exposition photo")
             st.write("ou installation visuelle")
         
-        st.markdown("### 🎯 Thématiques clés")
-        st.write("""
-        • La physiologie de l'extrême : ce que l'apnée nous apprend sur le corps humain  
-        • Explorer et préserver : science et aventure au service de la connaissance  
-        • Le souffle comme outil de performance et d'équilibre  
-        • Leadership et gestion de mission en milieu extrême  
-        • L'océan comme source d'inspiration et d'humilité
-        """)
+        
         
         st.button("📧 Demander une conférence", key="conf")
 
@@ -1009,8 +1009,7 @@ if st.session_state.menu_selection == "Accueil":
             </div>
             """, unsafe_allow_html=True)
         
-        st.info("📸 **Photo profil**")
-        st.image("https://via.placeholder.com/300x400/1e3a8a/ffffff?text=Photo+Profil", use_container_width=True)
+        st.image("Photo/profil_02.png", use_container_width=True)
     
     
     st.markdown("---")
@@ -1073,6 +1072,7 @@ elif st.session_state.menu_selection == "Contact":
             if submitted:
                 if nom and email and message:
                     st.success("✅ Message envoyé avec succès ! Je vous répondrai dans les plus brefs délais.")
+                    #ajouter la logisue d'envoie de l'email
                 else:
                     st.error("⚠️ Veuillez remplir tous les champs obligatoires (*)")
     
