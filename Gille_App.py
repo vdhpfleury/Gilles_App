@@ -3,13 +3,18 @@ from streamlit_option_menu import option_menu
 import base64
 from carrousel import carrousel, preload_images
 
+# POUR ENVOYER DES EMAILS : https://discuss.streamlit.io/t/send-email-with-smtp-and-gmail-address/48145/2 
+
 # Configuration de la page
 st.set_page_config(
     page_title="Gilles Gambini - Apnéiste & Biologiste Marin",
     page_icon="🌊",
     layout="wide",
-    initial_sidebar_state="expanded"
+    initial_sidebar_state="collapsed",
 )
+
+
+
 
 # Initialiser le session_state pour la navigation
 if 'menu_selection' not in st.session_state:
