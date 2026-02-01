@@ -161,7 +161,12 @@ if st.session_state.menu_selection == "Accueil":
 
     with col1 : 
         st.subheader("Actualités")
-        st.write("...")
+        st.markdown("""
+        - **Février 2026** : Intégration travail de gestion des bases de données au laboratoire de biologie sous marines de Nice 
+        - **Mars    2026** : Expédition au Costa Rica
+        - **Avril   2026** : Expédition en Polynésie
+        - **Septembre 2026** : Championnat du monde d'apnée sous marines
+        """)
     with col2 : 
         carrousel("Photo/CARR_ACCEUIL", height=500, duration=3)
 
@@ -170,7 +175,7 @@ if st.session_state.menu_selection == "Accueil":
     st.header("📋 Détails des services")
 
 
-    tab_Mentoring, tab_Coaching, tab_Conferences, tab_Stages, tab_Hyperbares, tab_Cours_en_ligne = st.tabs(["Mentoring", "Coaching Apnée", "Conférences", "Stages", "Service Hyperbares", "Cours en ligne"])
+    tab_Mentoring, tab_Coaching, tab_Conferences, tab_Stages, tab_Hyperbares, tab_banque_image, tab_Cours_en_ligne = st.tabs(["Mentoring", "Coaching Apnée", "Conférences", "Stages", "Service Hyperbares", "Banque d'image", "Cours en ligne"])
     with tab_Mentoring:
         st.title("🧭 Mentoring Océan & Performance")
         st.subheader("Explorer, progresser, se dépasser")
@@ -301,7 +306,7 @@ if st.session_state.menu_selection == "Accueil":
 
     with tab_Coaching : 
         st.title("💙 Coaching Apnée : Suivi personnalisé")
-        col1, col2 = st.columns([2, 3])
+        col1, col2 = st.columns(2)
         with col1 :
             st.subheader("Progressez à votre rythme, avec un encadrement sur mesure")
                 
@@ -325,7 +330,7 @@ if st.session_state.menu_selection == "Accueil":
             ✓ Un plan de progression clair ajusté à vos capacités et à votre agenda  
             ✓ Un échange direct (mail ou message) pour toute question entre deux sessions
             """)
-        col1, col2 = st.columns([2, 1])
+        col1, col2 = st.columns(2)
         with col1:
             st.markdown("### 👥 Pour qui ?")
             st.write("🌊 Apnéistes débutants souhaitant progresser sereinement")
@@ -504,7 +509,7 @@ if st.session_state.menu_selection == "Accueil":
         # Stage 1 - Apnée sous glace
         with st.expander("❄️ Stage d'apnée sous glace : Sur mesure"):
         
-            col1, col2 = st.columns([2, 1])
+            col1, col2 = st.columns(2)
             with col1:
                 st.write("""
                 **Une expérience unique : le silence absolu, la lumière du froid, la maîtrise du souffle.**
@@ -537,12 +542,12 @@ if st.session_state.menu_selection == "Accueil":
                 st.markdown("**Formule individuelle**")
                 st.write("• 1 à 3 jours")
                 st.write("• Encadrement personnalisé")
-                st.markdown('<p class="price-tag">À partir de 800 € / jour</p>', unsafe_allow_html=True)
+                st.markdown('<p class="price-tag">À partir de 300 € / jour</p>', unsafe_allow_html=True)
             with col2:
                 st.markdown("**Formule groupe (2-6 personnes)**")
                 st.write("• 1 à 3 jours")
                 st.write("• Gestion logistique incluse")
-                st.markdown('<p class="price-tag">À partir de 400 € / personne / jour</p>', unsafe_allow_html=True)
+                st.markdown('<p class="price-tag">À partir de 120 € / personne / jour</p>', unsafe_allow_html=True)
             
             st.info("""
             **Période & lieu :** Décembre à avril (selon conditions) - Alpes françaises, Suisse, Norvège, Finlande, Groenland
@@ -595,7 +600,7 @@ if st.session_state.menu_selection == "Accueil":
                 
                 **Objectifs :**
                 
-                ✓ Approfondir la technique de descente et d'égalisation  
+                ✓ Approfondir la technique de descente et compensation  
                 ✓ Optimiser la performance des techniques de déplacement  
                 ✓ Explorer les réflexes physiologiques d'adaptation  
                 ✓ Développer la confiance et la gestion mentale à grande profondeur
@@ -758,7 +763,7 @@ if st.session_state.menu_selection == "Accueil":
         
         st.markdown("---")
         
-        st.header("⭐ Pourquoi me choisir ? / (remplacer par les dernière intervention réalisé)")
+        st.header("⭐ Pourquoi me choisir ?")
         
         col1, col2, col3 = st.columns(3)
         with col1:
@@ -786,18 +791,18 @@ if st.session_state.menu_selection == "Accueil":
             "Type de plongée": [
                 "Plongée simple (2B - 1 à 50 mètres)",
                 "Plongée simple (2A - 1 à 50 mètres)",
+                "Prestation moniteur apnée ou plongée",
                 "Plongée technique (3B - 50 à 100 mètres)",
                 "Plongée en recycleur hypoxique (>100 mètres)",
-                "Interventions spécifiques (complexes)",
                 "Forfaits missions longues (>5 jours)"
             ],
             "Tarif": [
+                "À partir de 300 € / jour",
                 "À partir de 600 € / jour",
-                "À partir de 800 € / jour",
-                "À partir de 1 200 € / jour",
+                "À partir de 250 € / jour",
+                "À partir de 1 000 € / jour",
                 "Sur devis",
-                "À partir de 1 500 € / jour",
-                "Sur demande (réduction possible)"
+                "Sur demande"
             ]
         }
         
@@ -810,19 +815,7 @@ if st.session_state.menu_selection == "Accueil":
         st.button("📧 Demander un devis", key="hyperbare")
 
     # PAGE PRODUITS EN LIGNE
-    with tab_Cours_en_ligne :
-        st.title("🛒 Produits en ligne")
-        
-        st.info("📸 **ESPACE IMAGE HEADER** - Montage de photos/vidéos produits")
-        st.image("https://via.placeholder.com/1200x400/059669/ffffff?text=Produits+en+ligne", use_container_width=True)
-        
-        st.write("""
-        Accédez à mes ressources professionnelles pour enrichir vos projets, formations ou simplement pour approfondir 
-        vos connaissances.
-        """)
-        
-        st.markdown("---")
-        
+    with tab_banque_image : 
         # Banque d'images
         st.header("📸 Banque d'images et vidéos")
         
@@ -854,82 +847,20 @@ if st.session_state.menu_selection == "Accueil":
             st.image("https://via.placeholder.com/400x300/1e3a8a/ffffff?text=Galerie+2", use_container_width=True)
             st.button("🔍 Parcourir la banque d'images", key="banque")
         
-        st.markdown("---")
+    
+    with tab_Cours_en_ligne :
+        st.title("🛒 Produits en ligne")
         
-        # Cours en ligne
-        st.header("🎓 Cours en ligne")
+        st.info("📸 **ESPACE IMAGE HEADER** - Montage de photos/vidéos produits")
+        st.image("https://via.placeholder.com/1200x400/059669/ffffff?text=Produits+en+ligne", use_container_width=True)
         
         st.write("""
-        Formez-vous à votre rythme avec des cours structurés, basés sur l'expérience terrain et la science.
+        Accédez à mes ressources professionnelles pour enrichir vos projets, formations ou simplement pour approfondir 
+        vos connaissances.
         """)
         
-        cours_list = [
-            {
-                "titre": "Physiologie de l'apnée",
-                "description": "Comprendre les mécanismes physiologiques de l'apnée et optimiser vos performances",
-                "duree": "4h de contenu",
-                "niveau": "Tous niveaux",
-                "prix": "89 €"
-            },
-            {
-                "titre": "Respiration & Performance",
-                "description": "Techniques de respiration pour le sport, la gestion du stress et le bien-être",
-                "duree": "3h de contenu",
-                "niveau": "Débutant",
-                "prix": "69 €"
-            },
-            {
-                "titre": "Apnée : de débutant à avancé",
-                "description": "Programme complet pour progresser en apnée de manière autonome et sécurisée",
-                "duree": "8h de contenu",
-                "niveau": "Débutant à avancé",
-                "prix": "149 €"
-            },
-            {
-                "titre": "Plongée scientifique : méthodes et protocoles",
-                "description": "Introduction aux techniques de collecte de données sous-marines",
-                "duree": "5h de contenu",
-                "niveau": "Plongeur N2 minimum",
-                "prix": "119 €"
-            },
-            {
-                "titre": "Photographie sous-marine",
-                "description": "Techniques, réglages et composition pour des images professionnelles",
-                "duree": "6h de contenu",
-                "niveau": "Intermédiaire",
-                "prix": "129 €"
-            },
-            {
-                "titre": "Vidéographie sous-marine 4K",
-                "description": "De la prise de vue au montage, créez des films immersifs",
-                "duree": "7h de contenu",
-                "niveau": "Intermédiaire à avancé",
-                "prix": "159 €"
-            }
-        ]
         
-        cols = st.columns(2)
-        for idx, cours in enumerate(cours_list):
-            with cols[idx % 2]:
-                with st.container():
-                    st.markdown(f"### 📚 {cours['titre']}")
-                    st.write(cours['description'])
-                    st.write(f"⏱️ **Durée :** {cours['duree']}")
-                    st.write(f"📊 **Niveau :** {cours['niveau']}")
-                    st.markdown(f'<p class="price-tag">{cours["prix"]}</p>', unsafe_allow_html=True)
-                    st.button(f"Accéder au cours", key=f"cours_{idx}")
-                    st.markdown("---")
-        
-        st.info("""
-        💡 **Tous les cours incluent :**
-        
-        ✓ Vidéos HD téléchargeables  
-        ✓ Fiches techniques PDF  
-        ✓ Exercices pratiques  
-        ✓ Accès à vie  
-        ✓ Mises à jour gratuites
-        """)
-    
+
     
 
 
