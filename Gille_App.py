@@ -162,7 +162,7 @@ if st.session_state.menu_selection == "Accueil":
     with col1 : 
         st.subheader("Actualités")
         st.markdown("""
-        - **Février 2026** : Intégration travail de gestion des bases de données au laboratoire de biologie sous marines de Nice 
+        - **Février 2026** : Gestion des bases de données du laboratoire de biologie sous marines de Nice 
         - **Mars    2026** : Expédition au Costa Rica
         - **Avril   2026** : Expédition en Polynésie
         - **Septembre 2026** : Championnat du monde d'apnée sous marines
