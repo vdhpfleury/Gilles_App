@@ -2,8 +2,10 @@ import streamlit as st
 from streamlit_option_menu import option_menu
 import base64
 from carrousel import carrousel, preload_images
-
-# POUR ENVOYER DES EMAILS : https://discuss.streamlit.io/t/send-email-with-smtp-and-gmail-address/48145/2 
+import smtplib
+from email.mime.text import MIMEText
+import time as time
+from datetime import datetime
 
 # Configuration de la page
 st.set_page_config(
@@ -87,6 +89,85 @@ def img_to_base64(path):
     with open(path, "rb") as f:
         return base64.b64encode(f.read()).decode()
 
+def send_email(email_sender, email_receiver, subject, main_text, password="wycs fblq gmci ffpz"):
+    try:
+        msg = MIMEText(main_text)
+        msg['From'] = email_sender
+        msg['To'] = email_receiver
+        msg['Subject'] = subject
+
+        server = smtplib.SMTP('smtp.gmail.com', 587)
+        server.starttls()
+        server.login(email_sender, password)
+        server.sendmail(email_sender, email_receiver, msg.as_string())
+        server.quit()
+
+        st.success('Email sent successfully! 🚀')
+        time.sleep(2)
+    except Exception as e:
+        st.error(f"Erreur lors de l’envoi de l’e-mail : {e}")
+
+
+@st.dialog("Me contacter")
+def show_popup(Sujet_index, sub_topic, rdv=False):
+    st.markdown("### 📝 Formulaire de contact")
+    
+    with st.form("contact_form"):
+        nom = st.text_input("Nom complet *", key="fc_out_app_name")
+        email = st.text_input("Email *", key="fc_out_app_mail")
+        telephone = st.text_input("Téléphone", key="fc_out_app_phone")
+        sujet = st.selectbox(
+            "Sujet de votre demande *",
+            [
+                "Mentoring",
+                "Coaching Apnée",
+                "Conférence",
+                "Stage",
+                "Services Hyperbare",
+                "Banque d'images",
+                "Cours en ligne",
+                "Autre"
+            ],
+            index=Sujet_index,
+            key="fc_out_app_topic"
+        )
+        
+        if rdv==True : 
+            col1, col2 = st.columns(2)
+            with col1:
+                event_date = st.date_input("Jours souhiaté", value=None)
+            with col2:
+                event_time = st.time_input("A quelle heure ?")
+
+            if event_date:
+                event_datetime = datetime.combine(event_date, event_time)
+                st.info(f"Rdv plannifié le: {event_datetime.strftime('%Y-%m-%d %H:%M')}")
+
+
+        message = st.text_area("Votre message *", height=200, key="fc_out_app_message")
+        submitted = st.form_submit_button("Envoyer", use_container_width=True)#, key="fc_out_app_submitted")
+        
+        if submitted:
+            if nom and email and message:
+                body = f" name : \t{nom} \n email : \t{email} \n tel : \t{telephone} \n sujet de la demande : {sujet} \n sous sujet : sub_topic \n\n ----- Message du client ----- \n {message}"
+                if rdv == True : 
+                    body += f"\n\n Rdv souhaité le: {event_datetime.strftime('%Y-%m-%d %H:%M')}"
+                
+                send_email(
+                    email_sender="inconitocx@gmail.com", 
+                    email_receiver="fleury.vdhp@gmail.com ",#"gilles.gambini@hotmail.fr", 
+                    subject=sujet, 
+                    main_text=body, 
+                    password="wycs fblq gmci ffpz"
+                )
+                st.rerun()
+            else:
+                st.error("⚠️ Veuillez remplir tous les champs obligatoires (*)")
+                st.rerun()
+            
+
+
+test = "wycs fblq gmci ffpz"
 fb = img_to_base64("Photo/RESEAU/facebook.png")
 li = img_to_base64("Photo/RESEAU/linkedIn.png")
 ig = img_to_base64("Photo/RESEAU/Instagram.png")
@@ -237,7 +318,11 @@ if st.session_state.menu_selection == "Accueil":
             with col2:
                 st.markdown('<p class="price-tag">150 € / séance</p>', unsafe_allow_html=True)
                 st.markdown('<p class="price-tag">ou 700 € / 5 séances</p>', unsafe_allow_html=True)
-                st.button("Réserver un appel découverte", key="mentoring1")
+                mentorin1 = st.button("Réserver un appel découverte", key="mentoring1")
+            
+            if mentorin1 : 
+                show_popup(Sujet_index=0, sub_topic="Mentoring individuel - Réservation d'un appel découverte", rdv=True)
+                
         
         # Formule 2
         with st.expander("👥 Mentoring collectif « Ocean Skills »"):
@@ -253,7 +338,11 @@ if st.session_state.menu_selection == "Accueil":
                 """)
             with col2:
                 st.markdown('<p class="price-tag">60 € / mois</p>', unsafe_allow_html=True)
-                st.button("Rejoindre un groupe", key="mentoring2")
+                mentoring2 = st.button("Rejoindre un groupe", key="mentoring2")
+
+            if mentoring2: 
+                show_popup(Sujet_index=0, sub_topic="Mentoring collectif - Rejoindre un groupe", rdv=False)
+                                    
         
         # Formule 3
         with st.expander("💼 Mentoring carrière « Carrière bleue »"):
@@ -273,7 +362,11 @@ if st.session_state.menu_selection == "Accueil":
                 """)
             with col2:
                 st.markdown('<p class="price-tag">100 € / mois</p>', unsafe_allow_html=True)
-                st.button("Débuter mon parcours", key="mentoring3")
+                mentoring3 = st.button("Me contacter", key="mentoring3")
+            
+            if mentoring3: 
+                show_popup(Sujet_index=0, sub_topic="Mentoring - Carrière Bleu", rdv=False)
+                
         
         # Formule 4
         with st.expander("⭐ Mentoring carrière « Filleul »"):
@@ -294,7 +387,11 @@ if st.session_state.menu_selection == "Accueil":
                 """)
             with col2:
                 st.markdown('<p class="price-tag">150 € / mois</p>', unsafe_allow_html=True)
-                st.button("Candidater", key="mentoring4")
+                mentoring4 = st.button("Candidater", key="mentoring4")
+
+            if mentoring4: 
+                show_popup(Sujet_index=0, sub_topic="Mentoring - Carrière Filleul", rdv=False)
+     
         
         #st.markdown("---")
         
@@ -351,8 +448,10 @@ if st.session_state.menu_selection == "Accueil":
             st.write("✓ Bloc d'exercices personnalisé")
             st.write("✓ Suivi et adaptation mensuelle")
             st.markdown('<p class="price-tag">100 € / mois</p>', unsafe_allow_html=True)
-            st.button("Réserver mon appel découverte", key="coaching")
+            coaching = st.button("Réserver mon appel découverte", key="coaching")
         
+        if coaching : 
+            show_popup(Sujet_index=1, sub_topic="Coacing en apnée - suivit personnalisé", rdv=True)
 
         st.markdown("### ⭐ Pourquoi ce coaching est différent")
         col1, col2 = st.columns(2)
@@ -490,8 +589,11 @@ if st.session_state.menu_selection == "Accueil":
         
         
         
-        st.button("📧 Demander une conférence", key="conf")
+        conference = st.button("📧 Demander une conférence", key="conf")
 
+        if conference : 
+            show_popup(Sujet_index=2, sub_topic="Conférence - Demande de réservation", rdv=True)
+        
     with tab_Stages : 
         st.title("🏊 Stages")
 
@@ -504,6 +606,10 @@ if st.session_state.menu_selection == "Accueil":
             Ils s'adressent à celles et ceux qui souhaitent se reconnecter à l'océan, apprendre à mieux respirer, repousser leurs 
             limites ou comprendre le milieu marin à travers une approche rigoureuse, bienveillante et passionnée.
             """)
+            stages = st.button("📧 Réserver un stage", key="stages", type="primary")
+            if stages : 
+                show_popup(Sujet_index=3, sub_topic="Demande de Stage", rdv=False)
+
     
     
         with col2:
@@ -704,7 +810,6 @@ if st.session_state.menu_selection == "Accueil":
             
             st.markdown('<div class="citation">« Chaque stage est une expérience humaine et sensorielle. On apprend à mieux respirer, à mieux comprendre... et à mieux vivre. »</div>', unsafe_allow_html=True)
             
-            st.button("📧 Réserver un stage", key="stages")
 
     with tab_Hyperbares : 
         st.title("⚙️ Services d'interventions en milieu hyperbare")
@@ -817,41 +922,44 @@ if st.session_state.menu_selection == "Accueil":
         
         st.info("💡 Pour des devis personnalisés ou des missions urgentes, n'hésitez pas à me contacter directement.")
         
-        st.button("📧 Demander un devis", key="hyperbare")
+        hyperbare = st.button("📧 Demander un devis", key="hyperbare")
+
+        if hyperbare : 
+            show_popup(Sujet_index = 4, sub_topic="Demande de devis - services hyperbare", rdv=False)
 
     # PAGE PRODUITS EN LIGNE
     with tab_banque_image : 
         # Banque d'images
         st.header("📸 Banque d'images et vidéos")
         
-        col1, col2 = st.columns([2, 1])
-        with col1:
-            st.markdown("""
-            ### Vidéos 4K et Photos Haute Qualité
+        #col1, col2 = st.columns([2, 1])
+        #with col1:
+        st.markdown("""
+        ### Vidéos 4K et Photos Haute Qualité
             
-            Des années d'expéditions, de plongées et d'explorations capturées en images professionnelles.
+        Des années d'expéditions, de plongées et d'explorations capturées en images professionnelles.
             
-            **Contenu disponible :**
+        **Contenu disponible :**
             
-            ✓ Faune marine méditerranéenne et tropicale  
-            ✓ Apnée profonde et performances sportives  
-            ✓ Plongées scientifiques et missions de recherche  
-            ✓ Expéditions (Groenland, fjords, récifs)  
-            ✓ Apnée sous glace  
-            ✓ Portraits sous-marins
+        ✓ Faune marine méditerranéenne et tropicale  
+        ✓ Apnée profonde et performances sportives  
+        ✓ Plongées scientifiques et missions de recherche  
+        ✓ Expéditions (Groenland, fjords, récifs)  
+        ✓ Apnée sous glace  
+        ✓ Portraits sous-marins
             
-            **Formats :**
+        **Formats :**
             
-            • Vidéos : 4K, 60fps, ProRes et H.264  
-            • Photos : RAW et JPEG haute résolution  
-            • Licences disponibles : usage personnel, commercial, éditorial
-            """)
-        with col2:
-            st.info("📸 **Aperçu galerie**")
-            st.image("https://via.placeholder.com/400x300/0ea5e9/ffffff?text=Galerie+1", use_container_width=True)
-            st.image("https://via.placeholder.com/400x300/1e3a8a/ffffff?text=Galerie+2", use_container_width=True)
-            st.button("🔍 Parcourir la banque d'images", key="banque")
-        
+        • Vidéos : 4K, 60fps, ProRes et H.264  
+        • Photos : RAW et JPEG haute résolution  
+        • Licences disponibles : usage personnel, commercial, éditorial
+        """)
+        #with col2:
+            #st.info("📸 **Aperçu galerie**")
+            #st.image("https://via.placeholder.com/400x300/0ea5e9/ffffff?text=Galerie+1", use_container_width=True)
+            #st.image("https://via.placeholder.com/400x300/1e3a8a/ffffff?text=Galerie+2", use_container_width=True)
+        banque = st.link_button("🔍 Voir la banque d'images", "https://www.pond5.com/fr/artist/gillesgambini679", type="primary")
+            
     
     with tab_Cours_en_ligne :
         st.title("🛒 Produits en ligne")
@@ -883,10 +991,10 @@ if st.session_state.menu_selection == "Accueil":
     with col1:
         st.markdown("### 📝 Formulaire de contact")
         
-        with st.form("contact_form"):
-            nom = st.text_input("Nom complet *")
-            email = st.text_input("Email *")
-            telephone = st.text_input("Téléphone")
+        with st.form("contact form"):
+            nom = st.text_input("Nom complet *", key="fc_in_app_name")
+            email = st.text_input("Email *", key="fc_in_app_mail")
+            telephone = st.text_input("Téléphone", key="fc_in_app_phone")
             
             sujet = st.selectbox(
                 "Sujet de votre demande *",
@@ -899,10 +1007,11 @@ if st.session_state.menu_selection == "Accueil":
                     "Banque d'images",
                     "Cours en ligne",
                     "Autre"
-                ]
+                ],
+                key="fc_in_app_topic"
             )
             
-            message = st.text_area("Votre message *", height=200)
+            message = st.text_area("Votre message *", height=200, key="fc_in_app_message")
             
             col_a, col_b = st.columns([1, 3])
             with col_a:
@@ -910,7 +1019,15 @@ if st.session_state.menu_selection == "Accueil":
             
             if submitted:
                 if nom and email and message:
-                    st.success("✅ Message envoyé avec succès ! Je vous répondrai dans les plus brefs délais.")
+                    body = f" name : \t{nom} \n email : \t{email} \n tel : \t{telephone} \n sujet de la demande : {sujet} \n\n ----- Demande ----- \n {message}"
+                    send_email(
+                        email_sender="inconitocx@gmail.com", 
+                        email_receiver="gilles.gambini@hotmail.fr", 
+                        subject=sujet, 
+                        main_text=body, 
+                        password="wycs fblq gmci ffpz"
+                        )
+
                 else:
                     st.error("⚠️ Veuillez remplir tous les champs obligatoires (*)")
     
