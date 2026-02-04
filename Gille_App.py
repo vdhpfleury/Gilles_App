@@ -873,22 +873,8 @@ if st.session_state.menu_selection == "Accueil":
         
         st.markdown("---")
         
-        st.header("⭐ Pourquoi me choisir ?")
         
-        col1, col2, col3 = st.columns(3)
-        with col1:
-            st.markdown("### 🎯 Expertise certifiée")
-            st.write("Classé 2A, 3B et plongeur recycleur hypoxique, pour des missions à toutes profondeurs avec peu de contraintes.")
-        with col2:
-            st.markdown("### 🛡️ Sécurité avant tout")
-            st.write("Protocoles rigoureux pour chaque plongée, équipements de pointe et techniques éprouvées.")
-        with col3:
-            st.markdown("### ⚡ Flexibilité & réactivité")
-            st.write("Disponible pour des missions urgentes ou de longue durée, adapté à vos besoins spécifiques.")
-        
-        st.markdown("---")
-        
-        st.header("💰 Tarifs")
+        st.header("Tarifs")
         
         st.write("""
         Je propose des tarifs compétitifs basés sur le marché et ajustés en fonction de la complexité de la mission, 
