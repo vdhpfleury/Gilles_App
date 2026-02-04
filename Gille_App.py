@@ -149,7 +149,7 @@ def show_popup(Sujet_index, sub_topic, rdv=False):
         
         if submitted:
             if nom and email and message:
-                body = f" name : \t{nom} \n email : \t{email} \n tel : \t{telephone} \n sujet de la demande : {sujet} \n sous sujet : sub_topic \n\n ----- Message du client ----- \n {message}"
+                body = f" name : \t{nom} \n email : \t{email} \n tel : \t{telephone} \n sujet de la demande : {sujet} \n sous sujet : {sub_topic} \n\n ----- Message du client ----- \n {message}"
                 if rdv == True : 
                     body += f"\n\n Rdv souhaité le: {event_datetime.strftime('%Y-%m-%d %H:%M')}"
                 
