@@ -318,7 +318,7 @@ if st.session_state.menu_selection == "Accueil":
             with col2:
                 st.markdown('<p class="price-tag">150 € / séance</p>', unsafe_allow_html=True)
                 st.markdown('<p class="price-tag">ou 700 € / 5 séances</p>', unsafe_allow_html=True)
-                mentorin1 = st.button("Réserver un appel découverte", key="mentoring1")
+                mentorin1 = st.button("Réserver un appel découverte", key="mentoring1", type="primary")
             
             if mentorin1 : 
                 show_popup(Sujet_index=0, sub_topic="Mentoring individuel - Réservation d'un appel découverte", rdv=True)
@@ -338,7 +338,7 @@ if st.session_state.menu_selection == "Accueil":
                 """)
             with col2:
                 st.markdown('<p class="price-tag">60 € / mois</p>', unsafe_allow_html=True)
-                mentoring2 = st.button("Rejoindre un groupe", key="mentoring2")
+                mentoring2 = st.button("Rejoindre un groupe", key="mentoring2", type="primary")
 
             if mentoring2: 
                 show_popup(Sujet_index=0, sub_topic="Mentoring collectif - Rejoindre un groupe", rdv=False)
@@ -362,7 +362,7 @@ if st.session_state.menu_selection == "Accueil":
                 """)
             with col2:
                 st.markdown('<p class="price-tag">100 € / mois</p>', unsafe_allow_html=True)
-                mentoring3 = st.button("Me contacter", key="mentoring3")
+                mentoring3 = st.button("Me contacter", key="mentoring3", type="primary")
             
             if mentoring3: 
                 show_popup(Sujet_index=0, sub_topic="Mentoring - Carrière Bleu", rdv=False)
@@ -387,7 +387,7 @@ if st.session_state.menu_selection == "Accueil":
                 """)
             with col2:
                 st.markdown('<p class="price-tag">150 € / mois</p>', unsafe_allow_html=True)
-                mentoring4 = st.button("Candidater", key="mentoring4")
+                mentoring4 = st.button("Candidater", key="mentoring4", type="primary")
 
             if mentoring4: 
                 show_popup(Sujet_index=0, sub_topic="Mentoring - Carrière Filleul", rdv=False)
@@ -448,7 +448,7 @@ if st.session_state.menu_selection == "Accueil":
             st.write("✓ Bloc d'exercices personnalisé")
             st.write("✓ Suivi et adaptation mensuelle")
             st.markdown('<p class="price-tag">100 € / mois</p>', unsafe_allow_html=True)
-            coaching = st.button("Réserver mon appel découverte", key="coaching")
+            coaching = st.button("Réserver mon appel découverte", key="coaching", type="primary")
         
         if coaching : 
             show_popup(Sujet_index=1, sub_topic="Coacing en apnée - suivit personnalisé", rdv=True)
@@ -465,7 +465,7 @@ if st.session_state.menu_selection == "Accueil":
     with tab_Conferences : 
         st.title("🎤 Conférences - Science, Océan & Performance Humaine")
 
-        col1, col2 = st.columns([2, 3])
+        col1, col2, col3 = st.columns([1, 2, 1])
 
         with col1 : 
             st.write("### 🎯 Thématiques clés")
@@ -490,19 +490,21 @@ if st.session_state.menu_selection == "Accueil":
             Entre images d'expédition, récits authentiques et apports scientifiques, elles offrent une expérience inspirante 
             et sensorielle, à la croisée de la science, du sport et de l'aventure.
             """)
+        with col3 : 
+            st.markdown("### Une approche unique")
+            st.write("""
+            Alliant rigueur scientifique, sensibilité artistique et expérience de terrain, mes interventions s'adressent à tous les publics :
+            
+            • Entreprises & séminaires de direction  
+            • Institutions & collectivités  
+            • Écoles, universités, festivals & musées
+            """)
+
+        conference = st.button("📧 Demander une conférence", key="conf", type="primary")
+
+        if conference : 
+            show_popup(Sujet_index=2, sub_topic="Conférence - Demande de réservation", rdv=True)
         
-        
-        
-        
-        
-        st.markdown("### Une approche unique")
-        st.write("""
-        Alliant rigueur scientifique, sensibilité artistique et expérience de terrain, mes interventions s'adressent à tous les publics :
-        
-        • Entreprises & séminaires de direction  
-        • Institutions & collectivités  
-        • Écoles, universités, festivals & musées
-        """)
         
         st.markdown("---")
         st.header("📋 Formules disponibles")
@@ -589,10 +591,6 @@ if st.session_state.menu_selection == "Accueil":
         
         
         
-        conference = st.button("📧 Demander une conférence", key="conf")
-
-        if conference : 
-            show_popup(Sujet_index=2, sub_topic="Conférence - Demande de réservation", rdv=True)
         
     with tab_Stages : 
         st.title("🏊 Stages")
@@ -636,10 +634,7 @@ if st.session_state.menu_selection == "Accueil":
                 ✓ Développer la maîtrise mentale et physique dans un environnement extrême
                 """)
             with col2:
-                st.info("📸 **Image apnée sous glace**")
-                st.image("https://via.placeholder.com/400x300/0ea5e9/ffffff?text=Sous+Glace", use_container_width=True)
-            
-            with st.expander("📋 Contenu du stage"):
+                st.write("📋 **Contenu du stage**")
                 st.markdown("""
                 ✓ Introduction à la physiologie du froid et à la thermorégulation  
                 ✓ Préparation mentale et respiratoire spécifique aux milieux extrêmes  
@@ -647,6 +642,7 @@ if st.session_state.menu_selection == "Accueil":
                 ✓ Immersion sous glace en apnée : exploration progressive et guidée  
                 ✓ Debriefing, retour d'expérience
                 """)
+                
         
             col1, col2 = st.columns(2)
             with col1:
@@ -716,26 +712,29 @@ if st.session_state.menu_selection == "Accueil":
                 ✓ Explorer les réflexes physiologiques d'adaptation  
                 ✓ Développer la confiance et la gestion mentale à grande profondeur
                 """)
-            with col2:
-                st.info("📸 **Image apnée avancée**")
-                st.image("https://via.placeholder.com/400x300/1e3a8a/ffffff?text=Avancé", use_container_width=True)
-            
-            with st.expander("📋 Contenu du stage"):
+
+                st.write("📋 Contenu du stage")
                 st.markdown("""
                 ✓ Théorie avancée : physiologie, récupération, nutrition, sécurité profonde  
                 ✓ Techniques : Mouthfill, free fall, duck dive, relaxation active, visualisation  
                 ✓ Mise en pratique en milieu naturel jusqu'à 60 m (selon niveau)  
                 ✓ Debriefings vidéo & plan d'entraînement personnalisé
                 """)
+
+
+            with col2:
+                st.info("📸 **Image apnée avancée**")
+                st.image("https://via.placeholder.com/400x300/1e3a8a/ffffff?text=Avancé", use_container_width=True)
+            
             
             col1, col2 = st.columns(2)
             with col1:
-                st.markdown("**Individuel**")
+                st.markdown("**Formule individuelle**")
                 st.write("• 2 jours")
                 st.write("• Bilan technique + suivi à distance (1 mois inclus)")
                 st.markdown('<p class="price-tag">450 € / jour</p>', unsafe_allow_html=True)
             with col2:
-                st.markdown("**Groupe (4-6 personnes)**")
+                st.markdown("**Formule de groupe (4-6 personnes)**")
                 st.write("• 2 jours complets")
                 st.write("• Immersions encadrées + ateliers")
                 st.markdown('<p class="price-tag">300 € / personne</p>', unsafe_allow_html=True)
@@ -758,26 +757,29 @@ if st.session_state.menu_selection == "Accueil":
                 ✓ Acquérir les bases de la cartographie sous-marine et du suivi écologique  
                 ✓ Se former aux gestes, méthodes et rigueurs du plongeur de recherche
                 """)
-            with col2:
-                st.info("📸 **Image plongée scientifique**")
-                st.image("https://via.placeholder.com/400x300/059669/ffffff?text=Scientifique", use_container_width=True)
-            
-            with st.expander("📋 Contenu du stage"):
+
+                st.expander("📋 **Contenu du stage**"):
                 st.markdown("""
                 ✓ Cours théoriques : écologie marine, méthodologie, sécurité scientifique  
                 ✓ Ateliers pratiques : transects, quadrats, inventaires, photo quadrat  
                 ✓ Mise en œuvre en mer : exercices réels sur site, encadrés par un professionnel  
                 ✓ Introduction à la photo scientifique sous-marine
                 """)
+
+            with col2:
+                st.info("📸 **Image plongée scientifique**")
+                st.image("https://via.placeholder.com/400x300/059669/ffffff?text=Scientifique", use_container_width=True)
+            
+
             
             col1, col2 = st.columns(2)
             with col1:
-                st.markdown("**Individuel**")
+                st.markdown("**Formule individuelle**")
                 st.write("• 2 jours complets")
                 st.write("• Programme intensif et personnalisé")
                 st.markdown('<p class="price-tag">500 € / jour</p>', unsafe_allow_html=True)
             with col2:
-                st.markdown("**Groupe (4-6 personnes)**")
+                st.markdown("**Formule de groupe (4-6 personnes)**")
                 st.write("• 3 jours (théorie + terrain)")
                 st.write("• Mise en pratique sur un site d'étude réel")
                 st.markdown('<p class="price-tag">350 € / personne</p>', unsafe_allow_html=True)
@@ -808,7 +810,7 @@ if st.session_state.menu_selection == "Accueil":
             Mise à l'eau depuis embarcation de plongée
             """)
             
-            st.markdown('<div class="citation">« Chaque stage est une expérience humaine et sensorielle. On apprend à mieux respirer, à mieux comprendre... et à mieux vivre. »</div>', unsafe_allow_html=True)
+        st.markdown('<div class="citation">« Chaque stage est une expérience humaine et sensorielle. On apprend à mieux respirer, à mieux comprendre... et à mieux vivre. »</div>', unsafe_allow_html=True)
             
 
     with tab_Hyperbares : 
@@ -908,7 +910,7 @@ if st.session_state.menu_selection == "Accueil":
         
         st.info("💡 Pour des devis personnalisés ou des missions urgentes, n'hésitez pas à me contacter directement.")
         
-        hyperbare = st.button("📧 Demander un devis", key="hyperbare")
+        hyperbare = st.button("📧 Demander un devis", key="hyperbare", type="primary")
 
         if hyperbare : 
             show_popup(Sujet_index = 4, sub_topic="Demande de devis - services hyperbare", rdv=False)
@@ -948,20 +950,14 @@ if st.session_state.menu_selection == "Accueil":
             
     
     with tab_Cours_en_ligne :
-        st.title("🛒 Produits en ligne")
-        
-        st.info("📸 **ESPACE IMAGE HEADER** - Montage de photos/vidéos produits")
-        st.image("https://via.placeholder.com/1200x400/059669/ffffff?text=Produits+en+ligne", use_container_width=True)
-        
+        st.title("Cours en ligne")
         st.write("""
         Accédez à mes ressources professionnelles pour enrichir vos projets, formations ou simplement pour approfondir 
         vos connaissances.
         """)
+        st.write("Retrouver tout mes cours en ligne sur la plateforme **UDEMY**.")
+        st.warning("Synchronisation des plateformes en cours")
         
-        
-
-    
-
 
     st.markdown("---")
     st.title("📧 Contact")
@@ -1001,7 +997,7 @@ if st.session_state.menu_selection == "Accueil":
             
             col_a, col_b = st.columns([1, 3])
             with col_a:
-                submitted = st.form_submit_button("Envoyer", use_container_width=True)
+                submitted = st.form_submit_button("Envoyer", use_container_width=True, type="primary")
             
             if submitted:
                 if nom and email and message:
@@ -1106,7 +1102,7 @@ elif st.session_state.menu_selection == "Contact":
             
             col_a, col_b = st.columns([1, 3])
             with col_a:
-                submitted = st.form_submit_button("Envoyer", use_container_width=True)
+                submitted = st.form_submit_button("Envoyer", use_container_width=True, type="primary")
             
             if submitted:
                 if nom and email and message:
