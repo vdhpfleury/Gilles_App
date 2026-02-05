@@ -243,19 +243,6 @@ if st.session_state.menu_selection == "Accueil":
        
        
 
-    col1, col2 = st.columns([1, 3])
-
-    with col1 : 
-        st.subheader("Actualités")
-        st.markdown("""
-        - **Février 2026** : Gestion des bases de données du laboratoire de biologie sous marines de Nice 
-        - **Mars    2026** : Expédition au Costa Rica
-        - **Avril   2026** : Expédition en Polynésie
-        - **Septembre 2026** : Championnat du monde d'apnée sous marines
-        """)
-    with col2 : 
-        carrousel("Photo/CARR_ACCEUIL", height=500, duration=3)
-
         
     # Bio
     st.header("📋 Détails des services")
@@ -453,14 +440,11 @@ if st.session_state.menu_selection == "Accueil":
         if coaching : 
             show_popup(Sujet_index=1, sub_topic="Coacing en apnée - suivit personnalisé", rdv=True)
 
-        st.markdown("### ⭐ Pourquoi ce coaching est différent")
-        col1, col2 = st.columns(2)
-        with col1:
-            st.write("✓ Basé sur la physiologie et la préparation mentale du sportif de haut niveau")
-            st.write("✓ Adapté à tous les niveaux et styles d'apnée")
-        with col2:
-            st.write("✓ Approche globale : physique, mental, technique et émotionnel")
-            st.write("✓ Suivi par un apnéiste professionnel diplômé d'État spécialisé en physiologie hyperbare")
+        st.markdown("### ⭐ Les avantages de ce coaching ")
+        st.write("✓ Basé sur la physiologie et la préparation mentale du sportif de haut niveau")
+        st.write("✓ Adapté à tous les niveaux et styles d'apnée")
+        st.write("✓ Approche globale : physique, mental, technique et émotionnel")
+        st.write("✓ Suivi par un apnéiste professionnel diplômé d'État spécialisé en physiologie hyperbare")
 
     with tab_Conferences : 
         st.title("🎤 Conférences - Science, Océan & Performance Humaine")
@@ -633,7 +617,7 @@ if st.session_state.menu_selection == "Accueil":
                 ✓ Apprendre la logistique et les techniques spécifiques à la plongée sous glace  
                 ✓ Développer la maîtrise mentale et physique dans un environnement extrême
                 """)
-            with col2:
+            
                 st.write("📋 **Contenu du stage**")
                 st.markdown("""
                 ✓ Introduction à la physiologie du froid et à la thermorégulation  
@@ -642,7 +626,10 @@ if st.session_state.menu_selection == "Accueil":
                 ✓ Immersion sous glace en apnée : exploration progressive et guidée  
                 ✓ Debriefing, retour d'expérience
                 """)
-                
+            with col2:
+                st.info("📸 **ESPACE IMAGE HEADER** - Photo de stage en action")
+                st.image("https://via.placeholder.com/1200x400/0ea5e9/ffffff?text=Stages", use_container_width=True)
+           
         
             col1, col2 = st.columns(2)
             with col1:
@@ -713,7 +700,7 @@ if st.session_state.menu_selection == "Accueil":
                 ✓ Développer la confiance et la gestion mentale à grande profondeur
                 """)
 
-                st.write("📋 Contenu du stage")
+                st.write("📋 **Contenu du stage**")
                 st.markdown("""
                 ✓ Théorie avancée : physiologie, récupération, nutrition, sécurité profonde  
                 ✓ Techniques : Mouthfill, free fall, duck dive, relaxation active, visualisation  
@@ -1046,7 +1033,12 @@ if st.session_state.menu_selection == "Accueil":
         
         st.image("Photo/profil_02.png", use_container_width=True)
     
+    st.markdown("---")
+
+    carrousel("Photo/CARR_ACCEUIL", height=500, duration=3)
     
+    
+
     st.markdown("---")
 
     st.header("Quelques interview")
