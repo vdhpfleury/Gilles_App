@@ -758,7 +758,7 @@ if st.session_state.menu_selection == "Accueil":
                 ✓ Se former aux gestes, méthodes et rigueurs du plongeur de recherche
                 """)
 
-                st.expander("📋 **Contenu du stage**"):
+                st.write("📋 **Contenu du stage**")
                 st.markdown("""
                 ✓ Cours théoriques : écologie marine, méthodologie, sécurité scientifique  
                 ✓ Ateliers pratiques : transects, quadrats, inventaires, photo quadrat  
