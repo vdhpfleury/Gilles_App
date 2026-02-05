@@ -940,7 +940,7 @@ if st.session_state.menu_selection == "Accueil":
     col1, col2 = st.columns([2, 1])
     
     with col1:
-        st.markdown("#### 📝 Pour toute demande d'information, réservation ou projet personnalisé, n'hésitez pas à me contacter.")
+        st.markdown("#### 📝 Contactez moi pour toute demande d'information.")
         
         with st.form("contact form"):
             nom = st.text_input("Nom complet *", key="fc_in_app_name")
