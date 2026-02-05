@@ -16,8 +16,6 @@ st.set_page_config(
 )
 
 
-
-
 # Initialiser le session_state pour la navigation
 if 'menu_selection' not in st.session_state:
     st.session_state.menu_selection = "Accueil"
@@ -107,7 +105,6 @@ def send_email(email_sender, email_receiver, subject, main_text, password="wycs 
     except Exception as e:
         st.error(f"Erreur lors de l’envoi de l’e-mail : {e}")
 
-
 @st.dialog("Me contacter")
 def show_popup(Sujet_index, sub_topic, rdv=False):
     st.markdown("### 📝 Formulaire de contact")
@@ -165,14 +162,9 @@ def show_popup(Sujet_index, sub_topic, rdv=False):
                 st.error("⚠️ Veuillez remplir tous les champs obligatoires (*)")
                 st.rerun()
             
-
-
-test = "wycs fblq gmci ffpz"
 fb = img_to_base64("Photo/RESEAU/facebook.png")
 li = img_to_base64("Photo/RESEAU/linkedIn.png")
 ig = img_to_base64("Photo/RESEAU/Instagram.png")
-
-
 
 # PAGE ACCUEIL
 if st.session_state.menu_selection == "Accueil":
@@ -228,10 +220,10 @@ if st.session_state.menu_selection == "Accueil":
                     st.markdown(f"**{titre}**")
                     st.caption(description)
         #st.markdown('<p class="sub-header">le details des services est disponible plus bas sur cette page</p>', unsafe_allow_html=True)
-       
-       
 
-        
+
+    carrousel("Photo/CARR_ACCEUIL", height=500, duration=3)
+
     # Bio
     st.header("📋 Détails des services")
 
@@ -395,44 +387,48 @@ if st.session_state.menu_selection == "Accueil":
             
             **L'objectif : vous aider à progresser durablement, sans surentraînement ni perte de motivation.**
             """)
-        with col2 : 
-            st.markdown("### 🎯 Le concept")
-            st.write("""
-            Une approche simple, efficace et personnalisée. Une séance par mois, des exercices ciblés, et un suivi continu.
-            
-            **Chaque mois, vous bénéficiez de :**
-            
-            ✓ 1 appel de suivi (30 min à 1h) pour faire le point sur vos sensations, vos progrès et ajuster la stratégie  
-            ✓ Un bloc d'exercices mensuel : préparation à sec, relaxation, renforcement, apnée, visualisation ou travail spécifique  
-            ✓ Un plan de progression clair ajusté à vos capacités et à votre agenda  
-            ✓ Un échange direct (mail ou message) pour toute question entre deux sessions
+
+            st.markdown("### Chaque mois, vous bénéficiez de :")
+            st.write("""               
+            :green[✓ 1 appel de suivi (30 min à 1h)] pour faire le point sur vos sensations, vos progrès et ajuster la stratégie  
+            :green[✓ Un bloc d'exercices mensuel] préparation à sec, relaxation, renforcement, apnée, visualisation ou travail spécifique  
+            :green[✓ Un plan de progression] clair ajusté à vos capacités et à votre agenda  
+            :green[✓ Un échange direct] (mail ou message) pour toute question entre deux sessions
             """)
-        col1, col2 = st.columns(2)
-        with col1:
+
+            col7, col8 = st.columns(2)
+            with col7 :
+                st.markdown("#### :green[100 € / mois] sans engagement")
+            with col8 :
+                coaching = st.button("Réserver mon appel découverte", key="coaching", type="primary")
+
+
             st.markdown("### 👥 Pour qui ?")
             st.write("🌊 Apnéistes débutants souhaitant progresser sereinement")
             st.write("📈 Pratiquants confirmés cherchant à franchir un cap ou progresser")
             st.write("🏆 Apnéistes de haut niveau désirant préparer des compétitions")
             st.write("🧘 Sportifs voulant travailler la respiration et la gestion mentale")
             st.write("📸 Photographes sous-marins souhaitant améliorer leur aisance sous l'eau")
-        with col2:
-            st.markdown("### Contenue et tarifs")
-            #st.markdown('<div class="service-card">', unsafe_allow_html=True)
-            st.write("**Sans engagement**")
-            st.write("✓ 1 visio/appel mensuel")
-            st.write("✓ Bloc d'exercices personnalisé")
-            st.write("✓ Suivi et adaptation mensuelle")
-            st.markdown('<p class="price-tag">100 € / mois</p>', unsafe_allow_html=True)
-            coaching = st.button("Réserver mon appel découverte", key="coaching", type="primary")
-        
-        if coaching : 
-            show_popup(Sujet_index=1, sub_topic="Coacing en apnée - suivit personnalisé", rdv=True)
 
-        st.markdown("### ⭐ Les avantages de ce coaching ")
-        st.write("✓ Basé sur la physiologie et la préparation mentale du sportif de haut niveau")
-        st.write("✓ Adapté à tous les niveaux et styles d'apnée")
-        st.write("✓ Approche globale : physique, mental, technique et émotionnel")
-        st.write("✓ Suivi par un apnéiste professionnel diplômé d'État spécialisé en physiologie hyperbare")
+            
+            
+            st.markdown("### ⭐ Les avantages de ce coaching ")
+            st.write("✓ Basé sur la physiologie et la préparation mentale du sportif de haut niveau")
+            st.write("✓ Adapté à tous les niveaux et styles d'apnée")
+            st.write("✓ Approche globale : physique, mental, technique et émotionnel")
+            st.write("✓ Suivi par un apnéiste professionnel diplômé d'État spécialisé en physiologie hyperbare")
+       
+            if coaching : 
+                show_popup(Sujet_index=1, sub_topic="Coacing en apnée - suivit personnalisé", rdv=True)
+
+
+
+        with col2 : 
+            st.image("Photo/CARR_STAGE_APNEE/img_apnee_12.jpg", use_container_width=True)
+        
+
+            
+        
 
     with tab_Conferences : 
         st.title("🎤 Conférences - Science, Océan & Performance Humaine")
@@ -583,12 +579,12 @@ if st.session_state.menu_selection == "Accueil":
     
     
         with col2:
-            st.info("📸 **ESPACE IMAGE HEADER** - Photo de stage en action")
-            st.image("https://via.placeholder.com/1200x400/0ea5e9/ffffff?text=Stages", use_container_width=True)
-           
+            a=0.
+            #st.image("Photo/STAGE_ICE/STAGE_ICE_03.jpg", caption="stage 2026", width=500)
+            #carrousel("Photo/STAGE_ICE", height=500, duration=3)
         
         # Stage 1 - Apnée sous glace
-        with st.expander("❄️ Stage d'apnée sous glace : Sur mesure"):
+        with st.expander("❄️ Stage d'apnée sous glace : Sur mesure", expanded=True):
         
             col1, col2 = st.columns(2)
             with col1:
@@ -614,29 +610,27 @@ if st.session_state.menu_selection == "Accueil":
                 ✓ Immersion sous glace en apnée : exploration progressive et guidée  
                 ✓ Debriefing, retour d'expérience
                 """)
+                   
+                col3, col4 = st.columns(2)
+                with col3:
+                    st.markdown("**Formule individuelle**")
+                    st.write("• 1 à 3 jours")
+                    st.write("• Encadrement personnalisé")
+                    st.markdown('<p class="price-tag">À partir de 300 € / jour</p>', unsafe_allow_html=True)
+                with col4:
+                    st.markdown("**Formule groupe (2-6 personnes)**")
+                    st.write("• 1 à 3 jours")
+                    st.write("• Gestion logistique incluse")
+                    st.markdown('<p class="price-tag">À partir de 120 € / personne / jour</p>', unsafe_allow_html=True)
+                
+                st.info("""
+                **Période & lieu :** Décembre à avril (selon conditions) - Alpes françaises, Suisse, Norvège, Finlande, Groenland
+                
+                **Pré-requis :** Bonne condition physique • Certificat médical d'aptitude à la plongée en apnée
+                """)
+            
             with col2:
-                st.info("📸 **ESPACE IMAGE HEADER** - Photo de stage en action")
-                st.image("https://via.placeholder.com/1200x400/0ea5e9/ffffff?text=Stages", use_container_width=True)
-           
-        
-            col1, col2 = st.columns(2)
-            with col1:
-                st.markdown("**Formule individuelle**")
-                st.write("• 1 à 3 jours")
-                st.write("• Encadrement personnalisé")
-                st.markdown('<p class="price-tag">À partir de 300 € / jour</p>', unsafe_allow_html=True)
-            with col2:
-                st.markdown("**Formule groupe (2-6 personnes)**")
-                st.write("• 1 à 3 jours")
-                st.write("• Gestion logistique incluse")
-                st.markdown('<p class="price-tag">À partir de 120 € / personne / jour</p>', unsafe_allow_html=True)
-            
-            st.info("""
-            **Période & lieu :** Décembre à avril (selon conditions) - Alpes françaises, Suisse, Norvège, Finlande, Groenland
-            
-            **Pré-requis :** Bonne condition physique • Certificat médical d'aptitude à la plongée en apnée
-            """)
-            
+                carrousel("Photo/CARR_STAGE_ICE", height=700, duration=5)
         
         # Stage 2 - Apnée Débutant
         with st.expander("🌊 Stage d'apnée : Niveau Débutant") : 
@@ -653,24 +647,23 @@ if st.session_state.menu_selection == "Accueil":
                 ✓ Apprendre les techniques de relaxation et de compensation  
                 ✓ Explorer la profondeur en douceur et en confiance
                 """)
+            
+                col3, col4 = st.columns(2)
+                with col3:
+                    st.markdown("**Individuel**")
+                    st.write("• 1 jour (6h) ou 2 jours (12h)")
+                    st.write("• Coaching personnalisé, analyse vidéo")
+                    st.markdown('<p class="price-tag">350 € / jour</p>', unsafe_allow_html=True)
+                with col4:
+                    st.markdown("**Groupe (4-6 personnes)**")
+                    st.write("• 2 jours complets (12h)")
+                    st.write("• Séances en mer + ateliers respiration")
+                    st.markdown('<p class="price-tag">220 € / personne</p>', unsafe_allow_html=True)
+                
+                st.success("✅ Aucun prérequis nécessaire — idéal pour une première approche de l'apnée")
             with col2:
-                st.info("📸 **Image débutant apnée**")
-                st.image("https://via.placeholder.com/400x300/3b82f6/ffffff?text=Débutant", use_container_width=True)
-            
-            col1, col2 = st.columns(2)
-            with col1:
-                st.markdown("**Individuel**")
-                st.write("• 1 jour (6h) ou 2 jours (12h)")
-                st.write("• Coaching personnalisé, analyse vidéo")
-                st.markdown('<p class="price-tag">350 € / jour</p>', unsafe_allow_html=True)
-            with col2:
-                st.markdown("**Groupe (4-6 personnes)**")
-                st.write("• 2 jours complets (12h)")
-                st.write("• Séances en mer + ateliers respiration")
-                st.markdown('<p class="price-tag">220 € / personne</p>', unsafe_allow_html=True)
-            
-            st.success("✅ Aucun prérequis nécessaire — idéal pour une première approche de l'apnée")
-            
+                carrousel("Photo/CARR_STAGE_APNEE", height=500, duration=5)
+
         
         # Stage 3 - Apnée Avancé
         with st.expander("🏆 Stage d'apnée : Niveau Avancé"):
@@ -696,94 +689,93 @@ if st.session_state.menu_selection == "Accueil":
                 ✓ Debriefings vidéo & plan d'entraînement personnalisé
                 """)
 
+                col3, col4 = st.columns(2)
+                with col3:
+                    st.markdown("**Formule individuelle**")
+                    st.write("• 2 jours")
+                    st.write("• Bilan technique + suivi à distance (1 mois inclus)")
+                    st.markdown('<p class="price-tag">450 € / jour</p>', unsafe_allow_html=True)
+                with col4:
+                    st.markdown("**Formule de groupe (4-6 personnes)**")
+                    st.write("• 2 jours complets")
+                    st.write("• Immersions encadrées + ateliers")
+                    st.markdown('<p class="price-tag">300 € / personne</p>', unsafe_allow_html=True)
+                
+                st.warning("⚠️ **Pré-requis :** Bonne expérience apnée, capable de descendre à -30m, niveau équivalent AIDA 2 / SSI Level 1 minimum")
 
             with col2:
-                st.info("📸 **Image apnée avancée**")
-                st.image("https://via.placeholder.com/400x300/1e3a8a/ffffff?text=Avancé", use_container_width=True)
-            
-            
-            col1, col2 = st.columns(2)
-            with col1:
-                st.markdown("**Formule individuelle**")
-                st.write("• 2 jours")
-                st.write("• Bilan technique + suivi à distance (1 mois inclus)")
-                st.markdown('<p class="price-tag">450 € / jour</p>', unsafe_allow_html=True)
-            with col2:
-                st.markdown("**Formule de groupe (4-6 personnes)**")
-                st.write("• 2 jours complets")
-                st.write("• Immersions encadrées + ateliers")
-                st.markdown('<p class="price-tag">300 € / personne</p>', unsafe_allow_html=True)
-            
-            st.warning("⚠️ **Pré-requis :** Bonne expérience apnée, capable de descendre à -30m, niveau équivalent AIDA 2 / SSI Level 1 minimum")
-            
+                carrousel("Photo/CARR_STAGE_APNEE", height=550, duration=5)
+
+                
         
         # Stage 4 - Plongée scientifique
         with st.expander("🔬 Stage de plongée scientifique"):
             
             col1, col2 = st.columns([2, 1])
             with col1:
-                st.write("""
-                **Plonger pour observer, comprendre et protéger.**
+                col9, col10 = st.columns(2)
+                with col9 : 
+                    st.write("""                   
+                    **Objectifs :**
+                    
+                    ✓ Découvrir la plongée scientifique et les protocoles d'étude marine  
+                    ✓ Apprendre les techniques d'échantillonnage et d'observation in situ  
+                    ✓ Acquérir les bases de la cartographie sous-marine et du suivi écologique  
+                    ✓ Se former aux gestes, méthodes et rigueurs du plongeur de recherche
+                    """)
+                with col10:
+                    st.write("📋 **Contenu du stage**")
+                    st.markdown("""
+                    ✓ Cours théoriques : écologie marine, méthodologie, sécurité scientifique  
+                    ✓ Ateliers pratiques : transects, quadrats, inventaires, photo quadrat  
+                    ✓ Mise en œuvre en mer : exercices réels sur site, encadrés par un professionnel  
+                    ✓ Introduction à la photo scientifique sous-marine
+                    """)
+          
+                col3, col4 = st.columns(2)
+                with col3:
+                    st.markdown("**Formule individuelle**")
+                    st.write("• 2 jours complets")
+                    st.write("• Programme intensif et personnalisé")
+                    st.markdown('<p class="price-tag">500 € / jour</p>', unsafe_allow_html=True)
+                with col4:
+                    st.markdown("**Formule de groupe (4-6 personnes)**")
+                    st.write("• 3 jours (théorie + terrain)")
+                    st.write("• Mise en pratique sur un site d'étude réel")
+                    st.markdown('<p class="price-tag">350 € / personne</p>', unsafe_allow_html=True)
                 
-                **Objectifs :**
+
+                # Infos pratiques
+                st.subheader("📍 Infos pratiques")
                 
-                ✓ Découvrir la plongée scientifique et les protocoles d'étude marine  
-                ✓ Apprendre les techniques d'échantillonnage et d'observation in situ  
-                ✓ Acquérir les bases de la cartographie sous-marine et du suivi écologique  
-                ✓ Se former aux gestes, méthodes et rigueurs du plongeur de recherche
+                col5, col6, col7 = st.columns(3)
+                with col5:
+                    st.markdown("**📍 Lieux**")
+                    st.write("Nice, Côte d'Azur, Méditerranée")
+                    st.write("(autres destinations sur demande)")
+                with col6:
+                    st.markdown("**⏱️ Durée**")
+                    st.write("1 à 3 jours selon le stage")
+                    st.write("Toute l'année")
+                with col7:
+                    st.markdown("**👨‍🏫 Encadrement**")
+                    st.write("Diplômé d'État (DEJEPS)")
+                    st.write("Plongeur scientifique (3B, 2A)")
+                    st.write("Apnéiste de haut niveau")
+
+                st.warning("⚠️ **Pré-requis :** Niveau minimum plongeur N2 ou équivalent. Possibilité de prêt de matériel selon disponibilité.")
+                st.warning("""
+                **Matériel :** Matériel de plongée non inclus (sauf précisé) • Matériel scientifique prêté • 
+                Mise à l'eau depuis embarcation de plongée
                 """)
 
-                st.write("📋 **Contenu du stage**")
-                st.markdown("""
-                ✓ Cours théoriques : écologie marine, méthodologie, sécurité scientifique  
-                ✓ Ateliers pratiques : transects, quadrats, inventaires, photo quadrat  
-                ✓ Mise en œuvre en mer : exercices réels sur site, encadrés par un professionnel  
-                ✓ Introduction à la photo scientifique sous-marine
-                """)
-
+            
             with col2:
-                st.info("📸 **Image plongée scientifique**")
-                st.image("https://via.placeholder.com/400x300/059669/ffffff?text=Scientifique", use_container_width=True)
-            
-
-            
-            col1, col2 = st.columns(2)
-            with col1:
-                st.markdown("**Formule individuelle**")
-                st.write("• 2 jours complets")
-                st.write("• Programme intensif et personnalisé")
-                st.markdown('<p class="price-tag">500 € / jour</p>', unsafe_allow_html=True)
-            with col2:
-                st.markdown("**Formule de groupe (4-6 personnes)**")
-                st.write("• 3 jours (théorie + terrain)")
-                st.write("• Mise en pratique sur un site d'étude réel")
-                st.markdown('<p class="price-tag">350 € / personne</p>', unsafe_allow_html=True)
-            
-            st.warning("⚠️ **Pré-requis :** Niveau minimum plongeur N2 ou équivalent. Possibilité de prêt de matériel selon disponibilité.")
+                st.image("Photo/CARR_ACCEUIL/img_acceuil_10.jpg", use_container_width=True)
+                st.image("Photo/ICE/ICE_12.jpeg", use_container_width=True)
             
         
-            # Infos pratiques
-            st.header("📍 Infos pratiques")
             
-            col1, col2, col3 = st.columns(3)
-            with col1:
-                st.markdown("**📍 Lieux**")
-                st.write("Nice, Côte d'Azur, Méditerranée")
-                st.write("(autres destinations sur demande)")
-            with col2:
-                st.markdown("**⏱️ Durée**")
-                st.write("1 à 3 jours selon le stage")
-                st.write("Toute l'année")
-            with col3:
-                st.markdown("**👨‍🏫 Encadrement**")
-                st.write("Diplômé d'État (DEJEPS)")
-                st.write("Plongeur scientifique (3B, 2A)")
-                st.write("Apnéiste de haut niveau")
-            
-            st.info("""
-            **Matériel :** Matériel de plongée non inclus (sauf précisé) • Matériel scientifique prêté • 
-            Mise à l'eau depuis embarcation de plongée
-            """)
             
         st.markdown('<div class="citation">« Chaque stage est une expérience humaine et sensorielle. On apprend à mieux respirer, à mieux comprendre... et à mieux vivre. »</div>', unsafe_allow_html=True)
             
@@ -819,7 +811,6 @@ if st.session_state.menu_selection == "Accueil":
             une plongée longue et sécurisée à de très grandes profondeurs.
             """)
         
-        st.markdown("---")
         
         st.header("🔧 Types d'Interventions")
         
@@ -830,99 +821,76 @@ if st.session_state.menu_selection == "Accueil":
             ✓ Opérateur sous-marin (tournages, publicités, clips)  
             ✓ Modèle subaquatique (marques, projets artistiques, tournages)  
             ✓ Interventions sur des infrastructures subaquatiques
-            """)
-        with col2:
-            st.markdown("""
             ✓ Inspection et entretien des équipements immergés  
             ✓ Opérations de sauvetage et de déblaiement en milieu hyperbare  
             ✓ Interventions de recherche  
             ✓ Interventions de dépannage
-            """)
-        
-        st.info("📸 **ESPACE GALERIE** - Photos d'interventions professionnelles")
-        col1, col2, col3 = st.columns(3)
-        with col1:
-            st.image("https://via.placeholder.com/350x250/1e3a8a/ffffff?text=Intervention+1", use_container_width=True)
+            """)           
+            
+            st.header("Tarifs")
+            
+            tarifs_data = {
+                "Type de plongée": [
+                    "Plongée simple (2B - 1 à 50 mètres)",
+                    "Plongée simple (2A - 1 à 50 mètres)",
+                    "Prestation moniteur apnée ou plongée",
+                    "Plongée technique (3B - 50 à 100 mètres)",
+                    "Plongée en recycleur hypoxique (>100 mètres)",
+                    "Forfaits missions longues (>5 jours)"
+                ],
+                "Tarif": [
+                    "À partir de 300 € / jour",
+                    "À partir de 600 € / jour",
+                    "À partir de 250 € / jour",
+                    "À partir de 1 000 € / jour",
+                    "Sur devis",
+                    "Sur demande"
+                ]
+            }
+            
+            import pandas as pd
+            df_tarifs = pd.DataFrame(tarifs_data)
+            st.table(df_tarifs)
+            
+            st.info("💡 Pour des devis personnalisés ou des missions urgentes, n'hésitez pas à me contacter directement.")
+            
+            hyperbare = st.button("➡️**Demander un devis**", key="hyperbare", type="primary")
+
+            if hyperbare : 
+                show_popup(Sujet_index = 4, sub_topic="Demande de devis - services hyperbare", rdv=False)
         with col2:
-            st.image("https://via.placeholder.com/350x250/3b82f6/ffffff?text=Intervention+2", use_container_width=True)
-        with col3:
-            st.image("https://via.placeholder.com/350x250/0ea5e9/ffffff?text=Intervention+3", use_container_width=True)
+            st.image("Photo/HYPERBAR/HYPER.jpg", use_container_width=True)
         
-        st.markdown("---")
-        
-        
-        st.header("Tarifs")
-        
-        st.write("""
-        Je propose des tarifs compétitifs basés sur le marché et ajustés en fonction de la complexité de la mission, 
-        de la durée et des risques liés à l'intervention.
-        
-        **Voici un aperçu des tarifs moyens pratiqués :**
-        """)
-        
-        tarifs_data = {
-            "Type de plongée": [
-                "Plongée simple (2B - 1 à 50 mètres)",
-                "Plongée simple (2A - 1 à 50 mètres)",
-                "Prestation moniteur apnée ou plongée",
-                "Plongée technique (3B - 50 à 100 mètres)",
-                "Plongée en recycleur hypoxique (>100 mètres)",
-                "Forfaits missions longues (>5 jours)"
-            ],
-            "Tarif": [
-                "À partir de 300 € / jour",
-                "À partir de 600 € / jour",
-                "À partir de 250 € / jour",
-                "À partir de 1 000 € / jour",
-                "Sur devis",
-                "Sur demande"
-            ]
-        }
-        
-        import pandas as pd
-        df_tarifs = pd.DataFrame(tarifs_data)
-        st.table(df_tarifs)
-        
-        st.info("💡 Pour des devis personnalisés ou des missions urgentes, n'hésitez pas à me contacter directement.")
-        
-        hyperbare = st.button("📧 Demander un devis", key="hyperbare", type="primary")
-
-        if hyperbare : 
-            show_popup(Sujet_index = 4, sub_topic="Demande de devis - services hyperbare", rdv=False)
-
     # PAGE PRODUITS EN LIGNE
     with tab_banque_image : 
         # Banque d'images
-        st.header("📸 Banque d'images et vidéos")
+        st.header("📸 Vidéos 4K et Photos Haute Qualité")
         
-        #col1, col2 = st.columns([2, 1])
-        #with col1:
-        st.markdown("""
-        ### Vidéos 4K et Photos Haute Qualité
-            
-        Des années d'expéditions, de plongées et d'explorations capturées en images professionnelles.
-            
-        **Contenu disponible :**
-            
-        ✓ Faune marine méditerranéenne et tropicale  
-        ✓ Apnée profonde et performances sportives  
-        ✓ Plongées scientifiques et missions de recherche  
-        ✓ Expéditions (Groenland, fjords, récifs)  
-        ✓ Apnée sous glace  
-        ✓ Portraits sous-marins
-            
-        **Formats :**
-            
-        • Vidéos : 4K, 60fps, ProRes et H.264  
-        • Photos : RAW et JPEG haute résolution  
-        • Licences disponibles : usage personnel, commercial, éditorial
-        """)
-        #with col2:
-            #st.info("📸 **Aperçu galerie**")
-            #st.image("https://via.placeholder.com/400x300/0ea5e9/ffffff?text=Galerie+1", use_container_width=True)
-            #st.image("https://via.placeholder.com/400x300/1e3a8a/ffffff?text=Galerie+2", use_container_width=True)
-        banque = st.link_button("🔍 Voir la banque d'images", "https://www.pond5.com/fr/artist/gillesgambini679", type="primary")
-            
+        col1, col2 = st.columns([1, 3])
+        with col1:
+            st.markdown("""
+               
+            Des années d'expéditions, de plongées et d'explorations capturées en images professionnelles.
+                
+            **Contenu disponible :**
+                
+            ✓ Faune marine méditerranéenne et tropicale  
+            ✓ Apnée profonde et performances sportives  
+            ✓ Plongées scientifiques et missions de recherche  
+            ✓ Expéditions (Groenland, fjords, récifs)  
+            ✓ Apnée sous glace  
+            ✓ Portraits sous-marins
+                
+            **Formats :**
+                
+            • Vidéos : 4K, 60fps, ProRes et H.264  
+            • Photos : RAW et JPEG haute résolution  
+            • Licences disponibles : usage personnel, commercial, éditorial
+            """)
+            banque = st.link_button("🔍 Voir la banque d'images", "https://www.pond5.com/fr/artist/gillesgambini679", type="primary")
+
+        with col2:
+            st.image("Photo/DSC01126.jpg", use_container_width=True)
     
     with tab_Cours_en_ligne :
         st.title("Cours en ligne")
@@ -940,7 +908,7 @@ if st.session_state.menu_selection == "Accueil":
     col1, col2 = st.columns([2, 1])
     
     with col1:
-        st.markdown("#### 📝 Contactez moi pour toute demande d'information.")
+        st.markdown("#### 📝 Contactez moi pour toute demande d'informations.")
         
         with st.form("contact form"):
             nom = st.text_input("Nom complet *", key="fc_in_app_name")
@@ -1013,13 +981,7 @@ if st.session_state.menu_selection == "Accueil":
             </div>
             """, unsafe_allow_html=True)
         
-        st.image("Photo/profil_02.png", use_container_width=True)
-    
-    st.markdown("---")
-
-    carrousel("Photo/CARR_ACCEUIL", height=500, duration=3)
-
-    
+        st.image("Photo/profil_02.png", use_container_width=True)   
 
     st.markdown("---")
 
