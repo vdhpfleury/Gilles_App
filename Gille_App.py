@@ -935,18 +935,12 @@ if st.session_state.menu_selection == "Accueil":
         
 
     st.markdown("---")
-    st.title("📧 Contact")
-    
-    st.write("""
-    Pour toute demande d'information, réservation ou projet personnalisé, n'hésitez pas à me contacter.
-    
-    Je réponds généralement sous 48h.
-    """)
+    st.title("📧 Formulaire de contact")
     
     col1, col2 = st.columns([2, 1])
     
     with col1:
-        st.markdown("### 📝 Formulaire de contact")
+        st.markdown("#### 📝 Pour toute demande d'information, réservation ou projet personnalisé, n'hésitez pas à me contacter.")
         
         with st.form("contact form"):
             nom = st.text_input("Nom complet *", key="fc_in_app_name")
