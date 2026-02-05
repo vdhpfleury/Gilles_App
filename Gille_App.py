@@ -173,18 +173,6 @@ li = img_to_base64("Photo/RESEAU/linkedIn.png")
 ig = img_to_base64("Photo/RESEAU/Instagram.png")
 
 
-# Menu de navigation
-with st.sidebar:
-    selected = option_menu(
-        menu_title="Navigation",
-        options=["Accueil", "Contact", "Qui suis-je ? +CV"],
-        icons=["house", "envelope", "envelope"],
-        menu_icon="cast",
-        default_index=["Accueil", "Contact", "Qui suis-je ? +CV"].index(st.session_state.menu_selection),
-        key="menu"
-    )
-    # Mettre à jour le session_state quand l'option_menu change
-    st.session_state.menu_selection = selected
 
 # PAGE ACCUEIL
 if st.session_state.menu_selection == "Accueil":
