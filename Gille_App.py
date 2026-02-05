@@ -190,7 +190,7 @@ with st.sidebar:
 if st.session_state.menu_selection == "Accueil":
     col1, col2 = st.columns([1,3])
     with col1 : 
-        st.image("Photo/profil_01.JPG", caption="Profil", use_container_width=True)
+        st.image("Photo/profil_01.JPG", caption="Profil", use_container_width=True, height=350)
 
     with col2 :
         st.markdown('<h1 class="main-header">Gilles Gambini</h1>', unsafe_allow_html=True)
@@ -239,7 +239,7 @@ if st.session_state.menu_selection == "Accueil":
                 with col:
                     st.markdown(f"**{titre}**")
                     st.caption(description)
-        st.markdown('<p class="sub-header">le details des services est disponible plus bas sur cette page</p>', unsafe_allow_html=True)
+        #st.markdown('<p class="sub-header">le details des services est disponible plus bas sur cette page</p>', unsafe_allow_html=True)
        
        
 
@@ -1193,4 +1193,4 @@ with col2:
     st.markdown("Apnéiste professionnel • Biologiste marin")
 with col3:
     #st.markdown("[Mentions légales](#) • [CGV](#)")
-    st.markdown("Toute les photos sont sonmise aux droits d'auteur. Me contacter pour toute utilisation")
+    st.markdown("Toute les photos sont sonmise aux droits d'auteur. Me contacter pour toute utilisation.")
