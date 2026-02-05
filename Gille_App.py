@@ -1036,7 +1036,7 @@ if st.session_state.menu_selection == "Accueil":
     st.markdown("---")
 
     carrousel("Photo/CARR_ACCEUIL", height=500, duration=3)
-    
+
     
 
     st.markdown("---")
@@ -1192,4 +1192,5 @@ with col1:
 with col2:
     st.markdown("Apnéiste professionnel • Biologiste marin")
 with col3:
-    st.markdown("[Mentions légales](#) • [CGV](#)")
+    #st.markdown("[Mentions légales](#) • [CGV](#)")
+    st.markdown("Toute les photos sont sonmise aux droits d'auteur. Me contacter pour toute utilisation")
