@@ -190,7 +190,7 @@ with st.sidebar:
 if st.session_state.menu_selection == "Accueil":
     col1, col2 = st.columns([1,3])
     with col1 : 
-        st.image("Photo/profil_01.JPG", caption="Profil", use_container_width=True, height=350)
+        st.image("Photo/profil_01.JPG", caption="Profil", use_container_width=True)
 
     with col2 :
         st.markdown('<h1 class="main-header">Gilles Gambini</h1>', unsafe_allow_html=True)
