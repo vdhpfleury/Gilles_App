@@ -1,0 +1,43 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import PricingCard from '../../components/PricingCard.astro';
+import { getCollection, render } from 'astro:content';
+
+export async function getStaticPaths() {
+  const services = await getCollection('services');
+  return services.map((service) => ({
+    params: { id: service.id },
+    props: { service },
+  }));
+}
+
+const { service } = Astro.props;
+const { Content } = await render(service);
+---
+
+<BaseLayout title={service.data.title} description={service.data.tagline}>
+  <section class="mx-auto max-w-4xl px-6 py-16">
+    <p class="text-sm font-semibold tracking-widest text-lagon uppercase">{service.data.tagline}</p>
+    <h1 class="font-display mt-2 mb-8 text-4xl font-semibold text-ivory">{service.data.title}</h1>
+
+    <div class="prose prose-invert max-w-none text-muted-1 prose-headings:font-display prose-headings:text-ivory prose-strong:text-ivory">
+      <Content />
+    </div>
+
+    {service.data.formules.length > 0 && (
+      <div class="mt-12">
+        <h2 class="font-display mb-6 text-2xl font-semibold text-ivory">Formules</h2>
+        <div class="grid gap-6 sm:grid-cols-2">
+          {service.data.formules.map((formule) => (
+            <PricingCard
+              titre={formule.titre}
+              description={formule.description}
+              prix={formule.prix}
+              cta={formule.cta}
+            />
+          ))}
+        </div>
+      </div>
+    )}
+  </section>
+</BaseLayout>

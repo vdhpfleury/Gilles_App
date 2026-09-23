@@ -1,0 +1,44 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import PricingCard from '../../components/PricingCard.astro';
+import { getCollection, render } from 'astro:content';
+
+export async function getStaticPaths() {
+  const stages = await getCollection('stages');
+  return stages.map((stage) => ({
+    params: { id: stage.id },
+    props: { stage },
+  }));
+}
+
+const { stage } = Astro.props;
+const { Content } = await render(stage);
+---
+
+<BaseLayout title={stage.data.title}>
+  <section class="mx-auto max-w-4xl px-6 py-16">
+    <p class="text-sm font-semibold tracking-widest text-lagon uppercase">{stage.data.niveau}</p>
+    <h1 class="font-display mt-2 mb-8 text-4xl font-semibold text-ivory">{stage.data.title}</h1>
+
+    <div class="prose prose-invert max-w-none text-muted-1 prose-headings:font-display prose-headings:text-ivory prose-strong:text-ivory">
+      <Content />
+    </div>
+
+    {stage.data.prerequis && (
+      <p class="mt-8 rounded-lg border border-lagon/40 bg-lagon/10 p-4 text-sm text-ivory">
+        <strong>Pré-requis :</strong> {stage.data.prerequis}
+      </p>
+    )}
+
+    {stage.data.formules.length > 0 && (
+      <div class="mt-12">
+        <h2 class="font-display mb-6 text-2xl font-semibold text-ivory">Formules</h2>
+        <div class="grid gap-6 sm:grid-cols-2">
+          {stage.data.formules.map((formule) => (
+            <PricingCard titre={formule.titre} description={formule.description} prix={formule.prix} />
+          ))}
+        </div>
+      </div>
+    )}
+  </section>
+</BaseLayout>

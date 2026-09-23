@@ -1,0 +1,27 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Icon from '../../components/Icon.astro';
+import { getCollection } from 'astro:content';
+
+const services = (await getCollection('services')).sort((a, b) => a.data.order - b.data.order);
+---
+
+<BaseLayout title="Services" description="L'ensemble des services de Gilles Gambini : mentoring, coaching apnée, conférences, stages, interventions hyperbare.">
+  <section class="mx-auto max-w-6xl px-6 py-16">
+    <h1 class="font-display mb-10 text-4xl font-semibold text-ivory">Services</h1>
+    <div class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+      {services.map((service) => (
+        <a
+          href={`/services/${service.id}`}
+          class="group flex flex-col gap-4 rounded-lg border border-white/15 bg-white/[0.03] p-6 transition hover:border-lagon"
+        >
+          <span class="flex h-12 w-12 items-center justify-center rounded-full border border-white/15 bg-white/[0.04] text-lagon">
+            <Icon name={service.data.icon} />
+          </span>
+          <h2 class="font-display text-lg font-semibold text-ivory">{service.data.title}</h2>
+          <p class="text-sm text-muted-1">{service.data.tagline}</p>
+        </a>
+      ))}
+    </div>
+  </section>
+</BaseLayout>

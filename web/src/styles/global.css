@@ -1,0 +1,21 @@
+@import "tailwindcss";
+@plugin "@tailwindcss/typography";
+
+@theme {
+  /* Charte "Abysse" — Gilles Gambini */
+  --color-ink: #0b0f14;
+  --color-abysse: #101b2c;
+  --color-lagon-deep: #3c6e71;
+  --color-lagon: #4f8a8d;
+  --color-ivory: #f4f1ea;
+  --color-muted-1: #b9c2c8;
+  --color-muted-2: #8b939a;
+
+  --font-display: "Fraunces", ui-serif, Georgia, serif;
+  --font-sans: "Archivo", ui-sans-serif, system-ui, sans-serif;
+}
+
+body {
+  background-color: var(--color-ink);
+  color: var(--color-ivory);
+}
