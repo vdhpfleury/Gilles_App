@@ -87,7 +87,13 @@ def img_to_base64(path):
     with open(path, "rb") as f:
         return base64.b64encode(f.read()).decode()
 
-def send_email(email_sender, email_receiver, subject, main_text, password="wycs fblq gmci ffpz"):
+def send_email(email_sender, email_receiver, subject, main_text):
+    try:
+        password = st.secrets["gmail_app_password"]
+    except (KeyError, FileNotFoundError):
+        st.error("Configuration manquante : ajoutez `gmail_app_password` dans les secrets Streamlit.")
+        return
+
     try:
         msg = MIMEText(main_text)
         msg['From'] = email_sender
@@ -151,11 +157,10 @@ def show_popup(Sujet_index, sub_topic, rdv=False):
                     body += f"\n\n Rdv souhaité le: {event_datetime.strftime('%Y-%m-%d %H:%M')}"
                 
                 send_email(
-                    email_sender="inconitocx@gmail.com", 
-                    email_receiver="fleury.vdhp@gmail.com ",#"gilles.gambini@hotmail.fr", 
-                    subject=sujet, 
-                    main_text=body, 
-                    password="wycs fblq gmci ffpz"
+                    email_sender="inconitocx@gmail.com",
+                    email_receiver="gilles.gambini@hotmail.fr",
+                    subject=sujet,
+                    main_text=body,
                 )
                 st.rerun()
             else:
@@ -940,11 +945,10 @@ if st.session_state.menu_selection == "Accueil":
                 if nom and email and message:
                     body = f" name : \t{nom} \n email : \t{email} \n tel : \t{telephone} \n sujet de la demande : {sujet} \n\n ----- Demande ----- \n {message}"
                     send_email(
-                        email_sender="inconitocx@gmail.com", 
-                        email_receiver="gilles.gambini@hotmail.fr", 
-                        subject=sujet, 
-                        main_text=body, 
-                        password="wycs fblq gmci ffpz"
+                        email_sender="inconitocx@gmail.com",
+                        email_receiver="gilles.gambini@hotmail.fr",
+                        subject=sujet,
+                        main_text=body,
                         )
 
                 else:
