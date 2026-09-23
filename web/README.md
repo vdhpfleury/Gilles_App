@@ -24,9 +24,31 @@ npm run preview   # sert le build de production
 - [x] Contenu des services et stages migré depuis le site Streamlit
 - [x] Formulaire de contact câblé sur Formspree (voir "Formulaire de contact" ci-dessous)
 - [x] CMS Decap configuré (voir "Édition de contenu" ci-dessous)
-- [ ] Optimisation images finales (remplacer les photos placeholder dans `public/images/`)
-- [ ] SEO/perf (sitemap, meta, Lighthouse)
+- [x] SEO/perf : sitemap, robots.txt, meta canonical/OG/Twitter, image OG par défaut,
+      polices auto-hébergées, images optimisées via `astro:assets` (Lighthouse ~97-100 sur
+      toutes les pages testées, cf. "SEO & performance" ci-dessous)
+- [ ] Optimisation images finales (remplacer les photos placeholder dans `public/images/` et
+      `src/assets/images/`)
 - [ ] Déploiement (Vercel ou Netlify, tier gratuit)
+
+## SEO & performance
+
+- Sitemap généré automatiquement (`@astrojs/sitemap`) + `public/robots.txt`.
+- Chaque page a un titre, une description, une URL canonique et des balises Open
+  Graph/Twitter Card (voir `src/layouts/BaseLayout.astro`). Image OG par défaut :
+  `public/og-default.jpg` (à remplacer par une vraie photo dès que possible).
+- Polices Fraunces/Archivo auto-hébergées via `@fontsource*` plutôt que chargées depuis
+  fonts.googleapis.com — supprime une requête bloquante et une dépendance externe.
+- Les images utilisées dans les pages (`src/assets/images/`) passent par `astro:assets`
+  (`<Image />`) : conversion WebP, tailles responsives, `width`/`height` explicites contre le
+  layout shift. Les photos encore en `public/images/` sont des placeholders non utilisés par
+  une page — à trier une fois les photos définitives choisies.
+- **`site` dans `astro.config.mjs` est un placeholder (`gilles-gambini.example`)** — à
+  remplacer par le vrai nom de domaine dès qu'il est choisi (utilisé par le sitemap, les URLs
+  canoniques et les balises Open Graph).
+- Audits Lighthouse (build de prod, en local) : Accueil 97/100/100/100, Services 100/100/100/100,
+  détail de stage 99/100/100/100, Contact 99/100/100/100 (Performance/Accessibilité/Bonnes
+  pratiques/SEO).
 
 ## Formulaire de contact
 

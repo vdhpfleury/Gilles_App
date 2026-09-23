@@ -4,9 +4,18 @@ import '../styles/global.css';
 interface Props {
   title: string;
   description?: string;
+  image?: string;
 }
 
-const { title, description = "Apnéiste professionnel, biologiste marin et plongeur scientifique." } = Astro.props;
+const {
+  title,
+  description = "Apnéiste professionnel, biologiste marin et plongeur scientifique.",
+  image = '/og-default.jpg',
+} = Astro.props;
+
+const pageTitle = `${title} · Gilles Gambini`;
+const canonicalURL = new URL(Astro.url.pathname, Astro.site);
+const ogImageURL = new URL(image, Astro.site);
 ---
 
 <!doctype html>
@@ -16,14 +25,19 @@ const { title, description = "Apnéiste professionnel, biologiste marin et plong
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="description" content={description} />
-    <title>{title} · Gilles Gambini</title>
+    <link rel="canonical" href={canonicalURL} />
+    <title>{pageTitle}</title>
 
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Archivo:wght@400;500;600;700&display=swap"
-      rel="stylesheet"
-    />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content={pageTitle} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonicalURL} />
+    <meta property="og:image" content={ogImageURL} />
+    <meta property="og:locale" content="fr_FR" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={pageTitle} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={ogImageURL} />
   </head>
   <body class="font-sans bg-ink text-ivory min-h-screen flex flex-col">
     <a
