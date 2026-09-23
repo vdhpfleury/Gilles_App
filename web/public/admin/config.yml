@@ -1,0 +1,68 @@
+# Configuration Decap CMS.
+#
+# Backend "git-gateway" : suppose un hébergement sur Netlify avec Netlify
+# Identity + Git Gateway activés (gratuit) pour l'authentification de Gilles.
+# Si l'hébergement final est finalement Vercel plutôt que Netlify, ce backend
+# devra être remplacé par le backend "github" + un fournisseur OAuth dédié.
+backend:
+  name: git-gateway
+  branch: main
+
+# Permet de tester le CMS en local avec `npx decap-server` (ignoré en prod).
+local_backend: true
+
+media_folder: "web/public/images/uploads"
+public_folder: "/images/uploads"
+
+collections:
+  - name: "services"
+    label: "Services"
+    folder: "web/src/content/services"
+    create: true
+    slug: "{{slug}}"
+    extension: "md"
+    format: "frontmatter"
+    fields:
+      - { label: "Titre", name: "title", widget: "string" }
+      - { label: "Ordre d'affichage", name: "order", widget: "number", value_type: "int" }
+      - label: "Icône"
+        name: "icon"
+        widget: "select"
+        options: ["apnee", "biologie", "hyperbare", "conference", "stage", "contact"]
+      - { label: "Accroche", name: "tagline", widget: "string" }
+      - label: "Formules"
+        name: "formules"
+        widget: "list"
+        default: []
+        fields:
+          - { label: "Titre", name: "titre", widget: "string" }
+          - { label: "Description", name: "description", widget: "text" }
+          - { label: "Prix", name: "prix", widget: "string" }
+          - { label: "Texte du bouton", name: "cta", widget: "string", required: false }
+      - { label: "Description longue", name: "body", widget: "markdown" }
+
+  - name: "stages"
+    label: "Stages"
+    folder: "web/src/content/stages"
+    create: true
+    slug: "{{slug}}"
+    extension: "md"
+    format: "frontmatter"
+    fields:
+      - { label: "Titre", name: "title", widget: "string" }
+      - { label: "Ordre d'affichage", name: "order", widget: "number", value_type: "int" }
+      - label: "Niveau"
+        name: "niveau"
+        widget: "select"
+        options: ["Débutant", "Avancé", "Sur mesure", "Scientifique"]
+      - { label: "Pré-requis", name: "prerequis", widget: "string", required: false }
+      - label: "Formules"
+        name: "formules"
+        widget: "list"
+        default: []
+        fields:
+          - { label: "Titre", name: "titre", widget: "string" }
+          - { label: "Description", name: "description", widget: "text" }
+          - { label: "Prix", name: "prix", widget: "string" }
+          - { label: "Texte du bouton", name: "cta", widget: "string", required: false }
+      - { label: "Description longue", name: "body", widget: "markdown" }

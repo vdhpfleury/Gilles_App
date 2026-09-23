@@ -1,5 +1,8 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
+
+const formspreeId = import.meta.env.PUBLIC_FORMSPREE_ID as string | undefined;
+const isConfigured = Boolean(formspreeId);
 ---
 
 <BaseLayout title="Contact" description="Contactez Gilles Gambini pour une demande de mentoring, coaching, conférence, stage ou intervention hyperbare.">
@@ -11,11 +14,24 @@ import BaseLayout from '../layouts/BaseLayout.astro';
         contacter. Je réponds généralement sous 48h.
       </p>
 
-      <!--
-        Formulaire statique pour l'instant : le câblage vers un service d'envoi
-        (Formspree ou fonction serverless) est prévu en Phase 4 de la refonte.
-      -->
-      <form class="flex flex-col gap-5">
+      {!isConfigured && (
+        <p class="mb-6 rounded-md border border-lagon/40 bg-lagon/10 p-3 text-xs text-ivory">
+          Formulaire en attente de configuration (<code>PUBLIC_FORMSPREE_ID</code>) — écrivez-moi
+          directement à <a href="mailto:gilles.gambini@hotmail.fr" class="underline">gilles.gambini@hotmail.fr</a>.
+        </p>
+      )}
+
+      <form
+        id="contact-form"
+        class="flex flex-col gap-5"
+        method="POST"
+        action={isConfigured ? `https://formspree.io/f/${formspreeId}` : undefined}
+      >
+        <div aria-hidden="true" style="position: absolute; left: -9999px;">
+          <label for="_gotcha">Ne pas remplir ce champ</label>
+          <input type="text" id="_gotcha" name="_gotcha" tabindex="-1" autocomplete="off" />
+        </div>
+
         <div class="grid gap-5 sm:grid-cols-2">
           <div class="flex flex-col gap-2">
             <label for="nom" class="text-xs text-muted-1">Nom complet *</label>
@@ -82,11 +98,12 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 
         <button
           type="submit"
-          class="self-start rounded-sm bg-lagon px-7 py-3 text-xs font-semibold tracking-widest text-ink uppercase hover:opacity-90"
+          disabled={!isConfigured}
+          class="self-start rounded-sm bg-lagon px-7 py-3 text-xs font-semibold tracking-widest text-ink uppercase hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-40"
         >
           Envoyer
         </button>
-        <p class="text-xs text-muted-2">Le formulaire sera connecté d'ici la mise en production.</p>
+        <p id="form-status" role="status" aria-live="polite" class="text-xs text-muted-1"></p>
       </form>
     </div>
 
@@ -113,4 +130,44 @@ import BaseLayout from '../layouts/BaseLayout.astro';
       </div>
     </div>
   </section>
+
+  <script>
+    const form = document.getElementById('contact-form');
+
+    if (form instanceof HTMLFormElement && form.action.startsWith('https://formspree.io')) {
+      const status = document.getElementById('form-status');
+      const submitBtn = form.querySelector('button[type="submit"]');
+
+      form.addEventListener('submit', async (event) => {
+        event.preventDefault();
+        submitBtn?.setAttribute('disabled', 'true');
+        if (status) status.textContent = 'Envoi en cours…';
+
+        try {
+          const response = await fetch(form.action, {
+            method: 'POST',
+            body: new FormData(form),
+            headers: { Accept: 'application/json' },
+          });
+
+          if (response.ok) {
+            form.reset();
+            if (status) status.textContent = 'Message envoyé — je vous répondrai sous 48h.';
+          } else {
+            if (status) {
+              status.textContent =
+                "Une erreur est survenue, réessayez ou écrivez-moi directement à gilles.gambini@hotmail.fr.";
+            }
+          }
+        } catch {
+          if (status) {
+            status.textContent =
+              "Une erreur est survenue, réessayez ou écrivez-moi directement à gilles.gambini@hotmail.fr.";
+          }
+        } finally {
+          submitBtn?.removeAttribute('disabled');
+        }
+      });
+    }
+  </script>
 </BaseLayout>

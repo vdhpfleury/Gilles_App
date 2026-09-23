@@ -8,15 +8,18 @@
     "start": "astro dev",
     "build": "astro check && astro build",
     "preview": "astro preview",
+    "cms": "decap-server",
     "astro": "astro"
   },
   "dependencies": {
-    "astro": "^5.1.1"
+    "astro": "^7.3.4",
+    "zod": "^4.6.5"
   },
   "devDependencies": {
     "@astrojs/check": "^0.9.4",
     "@tailwindcss/typography": "^0.5.15",
     "@tailwindcss/vite": "^4.0.0",
+    "decap-server": "^3.2.1",
     "tailwindcss": "^4.0.0",
     "typescript": "^5.7.2"
   }

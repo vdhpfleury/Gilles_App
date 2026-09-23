@@ -22,11 +22,34 @@ npm run preview   # sert le build de production
 - [x] Charte graphique "Abysse" (couleurs, typographies) appliquée dans `src/styles/global.css`
 - [x] Layout de base, navigation, footer
 - [x] Contenu des services et stages migré depuis le site Streamlit
-- [ ] Câblage du formulaire de contact (Phase 4 — service de formulaire géré / fonction serverless)
-- [ ] CMS Decap pour édition autonome du contenu (Phase 1 suite)
+- [x] Formulaire de contact câblé sur Formspree (voir "Formulaire de contact" ci-dessous)
+- [x] CMS Decap configuré (voir "Édition de contenu" ci-dessous)
 - [ ] Optimisation images finales (remplacer les photos placeholder dans `public/images/`)
 - [ ] SEO/perf (sitemap, meta, Lighthouse)
 - [ ] Déploiement (Vercel ou Netlify, tier gratuit)
+
+## Formulaire de contact
+
+Le formulaire (`/contact`) envoie vers [Formspree](https://formspree.io) (plan gratuit, 50
+soumissions/mois). Pour l'activer :
+
+1. Créer un compte Formspree et un formulaire avec `gilles.gambini@hotmail.fr` comme destinataire.
+2. Copier son ID dans `PUBLIC_FORMSPREE_ID` (voir `.env.example`).
+
+Sans cette variable, le formulaire affiche un message d'attente et un lien mailto de secours au
+lieu de soumettre silencieusement dans le vide. Un champ honeypot (`_gotcha`) filtre une partie du
+spam automatiquement (convention native Formspree).
+
+## Édition de contenu (CMS)
+
+Un CMS [Decap](https://decapcms.org) est configuré sur `/admin` (`public/admin/config.yml`), pour
+que Gilles puisse éditer services, stages, tarifs et textes sans toucher au code.
+
+- Backend actuellement configuré : `git-gateway`, ce qui suppose un **hébergement final sur
+  Netlify** avec Netlify Identity + Git Gateway activés (gratuit). Si l'hébergement retenu est
+  Vercel, il faudra remplacer ce backend par `github` + un fournisseur OAuth dédié.
+- Test en local : `npm run cms` (lance `decap-server`) puis ouvrir `/admin` en même temps que
+  `npm run dev`.
 
 ## Structure du contenu
 
