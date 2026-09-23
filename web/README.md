@@ -29,7 +29,7 @@ npm run preview   # sert le build de production
       toutes les pages testées, cf. "SEO & performance" ci-dessous)
 - [ ] Optimisation images finales (remplacer les photos placeholder dans `public/images/` et
       `src/assets/images/`)
-- [ ] Déploiement (Vercel ou Netlify, tier gratuit)
+- [ ] Choisir l'hébergeur (Vercel ou Netlify) et déployer (voir "Déploiement" ci-dessous)
 
 ## SEO & performance
 
@@ -72,6 +72,33 @@ que Gilles puisse éditer services, stages, tarifs et textes sans toucher au cod
   Vercel, il faudra remplacer ce backend par `github` + un fournisseur OAuth dédié.
 - Test en local : `npm run cms` (lance `decap-server`) puis ouvrir `/admin` en même temps que
   `npm run dev`.
+
+## Déploiement
+
+Le repo contient à la fois l'ancienne app Streamlit (racine) et ce site (`web/`) : dans les deux
+hébergeurs, il faut préciser que le projet vit dans le sous-dossier `web/`.
+
+### Netlify (recommandé pour le CMS — voir ci-dessus)
+
+1. "Add new site" → importer le repo GitHub.
+2. **Base directory** : `web`. Build command et publish directory sont déjà dans `netlify.toml`
+   (`npm run build` / `dist`), Netlify les reprend automatiquement.
+3. Dans les variables d'environnement du site : ajouter `PUBLIC_FORMSPREE_ID`.
+4. Activer **Netlify Identity** puis **Git Gateway** (Site settings → Identity) pour que le CMS
+   Decap (`/admin`) puisse authentifier Gilles et committer ses modifications.
+5. Une fois un nom de domaine choisi : le brancher dans Site settings → Domain management, puis
+   mettre à jour `site` dans `astro.config.mjs` et `Sitemap:` dans `public/robots.txt`.
+
+### Vercel
+
+1. "Add New Project" → importer le repo GitHub.
+2. **Root Directory** : `web` (Vercel détecte Astro automatiquement, aucune autre config requise
+   — `vercel.json` ne fait qu'ajouter les en-têtes de sécurité).
+3. Ajouter `PUBLIC_FORMSPREE_ID` dans les variables d'environnement du projet.
+4. Le CMS Decap est actuellement configuré pour Netlify (`git-gateway`) : avec Vercel il faudra
+   remplacer ce backend par `github` + un fournisseur OAuth (à faire si Vercel est retenu).
+5. Une fois un nom de domaine choisi : le brancher dans Project settings → Domains, puis mettre à
+   jour `site` dans `astro.config.mjs` et `Sitemap:` dans `public/robots.txt`.
 
 ## Structure du contenu
 
