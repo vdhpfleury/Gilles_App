@@ -1,0 +1,28 @@
+@import "tailwindcss";
+@plugin "@tailwindcss/typography";
+
+/* Polices auto-hébergées (évite la dépendance à fonts.googleapis.com) */
+@import "@fontsource-variable/fraunces/wght.css";
+@import "@fontsource/archivo/400.css";
+@import "@fontsource/archivo/500.css";
+@import "@fontsource/archivo/600.css";
+@import "@fontsource/archivo/700.css";
+
+@theme {
+  /* Charte "Abysse" — Gilles Gambini */
+  --color-ink: #0b0f14;
+  --color-abysse: #101b2c;
+  --color-lagon-deep: #3c6e71;
+  --color-lagon: #4f8a8d;
+  --color-ivory: #f4f1ea;
+  --color-muted-1: #b9c2c8;
+  --color-muted-2: #8b939a;
+
+  --font-display: "Fraunces Variable", ui-serif, Georgia, serif;
+  --font-sans: "Archivo", ui-sans-serif, system-ui, sans-serif;
+}
+
+body {
+  background-color: var(--color-ink);
+  color: var(--color-ivory);
+}

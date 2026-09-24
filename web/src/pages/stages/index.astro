@@ -1,0 +1,28 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { getCollection } from 'astro:content';
+
+const stages = (await getCollection('stages')).sort((a, b) => a.data.order - b.data.order);
+---
+
+<BaseLayout title="Stages" description="Stages d'apnée sous glace, débutant, avancé et de plongée scientifique avec Gilles Gambini.">
+  <section class="mx-auto max-w-6xl px-6 py-16">
+    <h1 class="font-display mb-4 text-4xl font-semibold text-ivory">Stages</h1>
+    <p class="mb-10 max-w-2xl text-muted-1">
+      Depuis plus de 10 ans, ces stages sont une immersion complète entre science, exploration et
+      performance — pour se reconnecter à l'océan, apprendre à mieux respirer et repousser ses
+      limites.
+    </p>
+    <div class="grid gap-6 sm:grid-cols-2">
+      {stages.map((stage) => (
+        <a
+          href={`/stages/${stage.id}`}
+          class="group flex flex-col gap-3 rounded-lg border border-white/15 bg-white/[0.03] p-6 transition hover:border-lagon"
+        >
+          <p class="text-xs font-semibold tracking-widest text-lagon uppercase">{stage.data.niveau}</p>
+          <h2 class="font-display text-xl font-semibold text-ivory">{stage.data.title}</h2>
+        </a>
+      ))}
+    </div>
+  </section>
+</BaseLayout>

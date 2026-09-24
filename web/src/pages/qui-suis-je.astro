@@ -1,0 +1,68 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { Image } from 'astro:assets';
+import portrait from '../assets/images/portrait.jpg';
+---
+
+<BaseLayout title="Qui suis-je ?" description="Apnéiste professionnel, biologiste marin, plongeur scientifique et astronaute analogue.">
+  <section class="mx-auto max-w-5xl px-6 py-16">
+    <div class="flex flex-col gap-10 md:flex-row md:items-start">
+      <Image
+        src={portrait}
+        alt="Portrait de Gilles Gambini"
+        class="w-full max-w-xs rounded-lg object-cover md:w-64"
+        width={320}
+        height={400}
+        quality={80}
+      />
+      <div>
+        <h1 class="font-display text-4xl font-semibold text-ivory">Gilles Gambini</h1>
+        <p class="mt-2 text-sm font-semibold tracking-widest text-lagon uppercase">
+          Apnéiste professionnel • Biologiste marin • Plongeur scientifique • Photographe
+        </p>
+        <p class="mt-2 text-sm text-muted-2">DEJEPS • Plongeur 2A, 3B • Recycleur hypoxique</p>
+      </div>
+    </div>
+
+    <div class="prose prose-invert mt-12 max-w-none text-muted-1 prose-headings:font-display prose-headings:text-ivory prose-strong:text-ivory">
+      <p>C'est ce qui guide chacun de mes coups de palme.</p>
+      <p>
+        Ingénieur en écologie marine et plongeur scientifique, je consacre ma carrière à l'étude
+        des milieux sous-marins, entre recherche scientifique, exploration et image.
+      </p>
+      <p>
+        Sportif de haut niveau en apnée profonde, je mets à l'épreuve mes connaissances de la
+        physiologie humaine dans des environnements extrêmes, que ce soit à travers mes
+        performances, mes enseignements ou mes collaborations avec des programmes de recherche,
+        notamment auprès de l'Agence Spatiale Européenne (ESA).
+      </p>
+      <p>
+        Cette collaboration m'a conduit à devenir astronaute analogue, participant à des
+        simulations de missions spatiales, où la maîtrise du corps et de l'esprit est mise à rude
+        épreuve. À la suite de ces expériences, une proposition officielle de formation au
+        programme spatial m'a été faite, un honneur rare qui témoigne de la convergence entre mes
+        travaux en milieu extrême, mes recherches scientifiques et mes aptitudes physiques et
+        mentales.
+      </p>
+      <p>
+        Au fil des années, j'ai réuni deux mondes : la rigueur scientifique et l'exploration
+        humaine. Mes plongées et mes missions m'ont conduit des laboratoires aux fjords glacés du
+        Groenland, des récifs méditerranéens aux abysses caribéens, toujours animé par la même
+        passion : découvrir, préserver, faire connaître et aimer l'océan.
+      </p>
+      <p>
+        Aujourd'hui, je partage cette expérience à travers des cours, formations, conférences,
+        coachings personnalisés et une banque d'images dédiée à la mer et à ses habitants.
+      </p>
+      <p>
+        Mon objectif est simple : <strong>transmettre, inspirer et reconnecter chacun à la nature,
+        avec respect, curiosité et émerveillement.</strong>
+      </p>
+      <p>
+        Les revenus issus de mes formations et de mes images servent à financer de nouvelles
+        expéditions scientifiques, à soutenir ma carrière sportive en apnée de haut niveau, et à
+        poursuivre mes recherches sur la physiologie humaine en milieux extrêmes.
+      </p>
+    </div>
+  </section>
+</BaseLayout>

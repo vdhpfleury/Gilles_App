@@ -1,0 +1,29 @@
+---
+interface Props {
+  eyebrow?: string;
+  titre: string;
+  description: string;
+  prix: string;
+  cta?: string;
+  ctaHref?: string;
+}
+
+const { eyebrow, titre, description, prix, cta, ctaHref = '/contact' } = Astro.props;
+---
+
+<div class="flex flex-col gap-3 rounded-lg border border-white/15 bg-white/[0.03] p-6">
+  {eyebrow && (
+    <p class="text-xs font-semibold tracking-widest text-lagon uppercase">{eyebrow}</p>
+  )}
+  <h3 class="font-display text-xl font-semibold text-ivory">{titre}</h3>
+  <p class="text-sm leading-relaxed text-muted-1">{description}</p>
+  <p class="mt-auto font-display text-lg font-semibold text-lagon">{prix}</p>
+  {cta && (
+    <a
+      href={ctaHref}
+      class="mt-2 inline-block rounded-sm bg-lagon px-5 py-2.5 text-center text-xs font-semibold tracking-widest text-ink uppercase hover:opacity-90"
+    >
+      {cta}
+    </a>
+  )}
+</div>
