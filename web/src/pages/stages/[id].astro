@@ -1,7 +1,9 @@
 ---
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import PricingCard from '../../components/PricingCard.astro';
+import Carousel from '../../components/Carousel.astro';
 import { getCollection, render } from 'astro:content';
+import type { ImageMetadata } from 'astro';
 
 export async function getStaticPaths() {
   const stages = await getCollection('stages');
@@ -13,6 +15,27 @@ export async function getStaticPaths() {
 
 const { stage } = Astro.props;
 const { Content } = await render(stage);
+
+const galleryModules = import.meta.glob<{ default: ImageMetadata }>(
+  '../../assets/gallery/*/*.jpg',
+  { eager: true },
+);
+
+function galleryFor(folder: string) {
+  return Object.entries(galleryModules)
+    .filter(([path]) => path.includes(`/gallery/${folder}/`))
+    .map(([, mod]) => ({ src: mod.default, alt: `${stage.data.title} — photo` }));
+}
+
+// Chaque stage peut afficher une petite galerie tournante liée à sa thématique.
+const galleryByStage: Record<string, { src: ImageMetadata; alt: string }[]> = {
+  'apnee-sous-glace': galleryFor('stage-ice'),
+  'apnee-debutant': galleryFor('stage-apnee'),
+  'apnee-avance': galleryFor('stage-apnee'),
+  'plongee-scientifique': galleryFor('scientifique'),
+};
+
+const gallery = galleryByStage[stage.id];
 ---
 
 <BaseLayout title={stage.data.title}>
@@ -23,6 +46,12 @@ const { Content } = await render(stage);
     <div class="prose prose-invert max-w-none text-muted-1 prose-headings:font-display prose-headings:text-ivory prose-strong:text-ivory">
       <Content />
     </div>
+
+    {gallery && gallery.length > 0 && (
+      <div class="mt-10">
+        <Carousel id={stage.id} images={gallery} height="360px" duration={4} />
+      </div>
+    )}
 
     {stage.data.prerequis && (
       <p class="mt-8 rounded-lg border border-lagon/40 bg-lagon/10 p-4 text-sm text-ivory">

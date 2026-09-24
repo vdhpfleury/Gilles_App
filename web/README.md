@@ -27,10 +27,12 @@ npm run preview   # sert le build de production
 - [x] SEO/perf : sitemap, robots.txt, meta canonical/OG/Twitter, image OG par défaut,
       polices auto-hébergées, images optimisées via `astro:assets` (Lighthouse ~97-100 sur
       toutes les pages testées, cf. "SEO & performance" ci-dessous)
-- [x] Photos définitives choisies avec Gilles pour le hero, le portrait et l'image OG (voir
-      "SEO & performance" ci-dessous) — les autres photos du dossier `Photo/` restent à trier au
-      fil de l'ajout de nouvelles pages/galeries
+- [x] Photos définitives choisies avec Gilles pour le hero, le portrait et l'image OG
 - [x] Hébergeur choisi (Netlify) et site déployé — https://gilles-gambini.netlify.app
+- [x] Galeries photo par thématique (accueil, mentoring, stages, hyperbare, banque d'images,
+      plongée scientifique) et section interviews sur l'accueil, pour retrouver la richesse
+      visuelle de la version Streamlit
+- [x] Lien du CTA "Banque d'images" corrigé (pointait vers /contact au lieu de Pond5)
 
 ## SEO & performance
 
@@ -41,11 +43,13 @@ npm run preview   # sert le build de production
   dans le repo d'origine).
 - Polices Fraunces/Archivo auto-hébergées via `@fontsource*` plutôt que chargées depuis
   fonts.googleapis.com — supprime une requête bloquante et une dépendance externe.
-- Les images utilisées dans les pages (`src/assets/images/hero-wave.jpg`, `portrait.jpg`) passent
-  par `astro:assets` (`<Image />`) : conversion WebP, tailles responsives, `width`/`height`
-  explicites contre le layout shift. Les photos encore en `public/images/` (ice, apnee, hyperbare,
-  science) ne sont pas utilisées par une page — à trier au fil de l'ajout de nouvelles
-  pages/galeries.
+- Toutes les images de pages passent par `astro:assets` (`<Image />`/`<Carousel />`) : conversion
+  WebP, tailles responsives, `width`/`height` explicites contre le layout shift. Les galeries
+  thématiques vivent dans `src/assets/gallery/<thème>/` (accueil, mentoring, stage-apnee,
+  stage-ice, scientifique) ; le composant `Carousel.astro` s'appuie sur `import.meta.glob` pour
+  les charger. La correspondance page → dossier de galerie est codée en dur dans
+  `src/pages/services/[id].astro` et `src/pages/stages/[id].astro` (à adapter si de nouvelles
+  photos ou pages sont ajoutées).
 - **`site` dans `astro.config.mjs` est un placeholder (`gilles-gambini.example`)** — à
   remplacer par le vrai nom de domaine dès qu'il est choisi (utilisé par le sitemap, les URLs
   canoniques et les balises Open Graph).
