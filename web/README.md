@@ -27,22 +27,25 @@ npm run preview   # sert le build de production
 - [x] SEO/perf : sitemap, robots.txt, meta canonical/OG/Twitter, image OG par défaut,
       polices auto-hébergées, images optimisées via `astro:assets` (Lighthouse ~97-100 sur
       toutes les pages testées, cf. "SEO & performance" ci-dessous)
-- [ ] Optimisation images finales (remplacer les photos placeholder dans `public/images/` et
-      `src/assets/images/`)
-- [ ] Choisir l'hébergeur (Vercel ou Netlify) et déployer (voir "Déploiement" ci-dessous)
+- [x] Photos définitives choisies avec Gilles pour le hero, le portrait et l'image OG (voir
+      "SEO & performance" ci-dessous) — les autres photos du dossier `Photo/` restent à trier au
+      fil de l'ajout de nouvelles pages/galeries
+- [x] Hébergeur choisi (Netlify) et site déployé — https://gilles-gambini.netlify.app
 
 ## SEO & performance
 
 - Sitemap généré automatiquement (`@astrojs/sitemap`) + `public/robots.txt`.
 - Chaque page a un titre, une description, une URL canonique et des balises Open
   Graph/Twitter Card (voir `src/layouts/BaseLayout.astro`). Image OG par défaut :
-  `public/og-default.jpg` (à remplacer par une vraie photo dès que possible).
+  `public/og-default.jpg`, générée à partir de la photo hero définitive (`APNEE/gilles 4.jpg`
+  dans le repo d'origine).
 - Polices Fraunces/Archivo auto-hébergées via `@fontsource*` plutôt que chargées depuis
   fonts.googleapis.com — supprime une requête bloquante et une dépendance externe.
-- Les images utilisées dans les pages (`src/assets/images/`) passent par `astro:assets`
-  (`<Image />`) : conversion WebP, tailles responsives, `width`/`height` explicites contre le
-  layout shift. Les photos encore en `public/images/` sont des placeholders non utilisés par
-  une page — à trier une fois les photos définitives choisies.
+- Les images utilisées dans les pages (`src/assets/images/hero-wave.jpg`, `portrait.jpg`) passent
+  par `astro:assets` (`<Image />`) : conversion WebP, tailles responsives, `width`/`height`
+  explicites contre le layout shift. Les photos encore en `public/images/` (ice, apnee, hyperbare,
+  science) ne sont pas utilisées par une page — à trier au fil de l'ajout de nouvelles
+  pages/galeries.
 - **`site` dans `astro.config.mjs` est un placeholder (`gilles-gambini.example`)** — à
   remplacer par le vrai nom de domaine dès qu'il est choisi (utilisé par le sitemap, les URLs
   canoniques et les balises Open Graph).

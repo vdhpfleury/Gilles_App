@@ -3,7 +3,7 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 import Icon from '../components/Icon.astro';
 import { Image } from 'astro:assets';
 import { getCollection } from 'astro:content';
-import heroImage from '../assets/images/abysse.jpg';
+import heroImage from '../assets/images/hero-wave.jpg';
 
 const services = (await getCollection('services')).sort((a, b) => a.data.order - b.data.order);
 ---
@@ -12,7 +12,7 @@ const services = (await getCollection('services')).sort((a, b) => a.data.order -
   <section class="relative overflow-hidden">
     <Image
       src={heroImage}
-      alt="Gilles Gambini en apnée dans le grand bleu"
+      alt="Gilles Gambini en apnée, émergeant sous une vague"
       class="absolute inset-0 h-full w-full object-cover"
       widths={[640, 1024, 1600, 2000]}
       sizes="100vw"
