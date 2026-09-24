@@ -7,6 +7,7 @@ const formule = z.object({
   description: z.string(),
   prix: z.string(),
   cta: z.string().optional(),
+  lien: z.string().optional(),
 });
 
 const services = defineCollection({

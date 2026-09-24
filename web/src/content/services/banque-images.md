@@ -12,6 +12,7 @@ formules:
       RAW et JPEG haute résolution.
     prix: "Sur la plateforme Pond5"
     cta: "Voir la banque d'images"
+    lien: "https://www.pond5.com/fr/artist/gillesgambini679"
 ---
 
 Des années d'expéditions, de plongées et d'explorations capturées en images professionnelles, disponibles à la licence pour vos projets personnels, commerciaux ou éditoriaux.

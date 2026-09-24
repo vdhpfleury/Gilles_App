@@ -39,6 +39,7 @@ collections:
           - { label: "Description", name: "description", widget: "text" }
           - { label: "Prix", name: "prix", widget: "string" }
           - { label: "Texte du bouton", name: "cta", widget: "string", required: false }
+          - { label: "Lien du bouton (externe, optionnel)", name: "lien", widget: "string", required: false, hint: "Laisser vide pour renvoyer vers le formulaire de contact" }
       - { label: "Description longue", name: "body", widget: "markdown" }
 
   - name: "stages"
@@ -65,4 +66,5 @@ collections:
           - { label: "Description", name: "description", widget: "text" }
           - { label: "Prix", name: "prix", widget: "string" }
           - { label: "Texte du bouton", name: "cta", widget: "string", required: false }
+          - { label: "Lien du bouton (externe, optionnel)", name: "lien", widget: "string", required: false, hint: "Laisser vide pour renvoyer vers le formulaire de contact" }
       - { label: "Description longue", name: "body", widget: "markdown" }

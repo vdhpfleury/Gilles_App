@@ -1,7 +1,12 @@
 ---
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import PricingCard from '../../components/PricingCard.astro';
+import Carousel from '../../components/Carousel.astro';
+import { Image } from 'astro:assets';
 import { getCollection, render } from 'astro:content';
+import type { ImageMetadata } from 'astro';
+import hyperbareImage from '../../assets/images/hyperbare.jpg';
+import banqueImagesImage from '../../assets/images/banque-images.jpg';
 
 export async function getStaticPaths() {
   const services = await getCollection('services');
@@ -13,6 +18,31 @@ export async function getStaticPaths() {
 
 const { service } = Astro.props;
 const { Content } = await render(service);
+
+const galleryModules = import.meta.glob<{ default: ImageMetadata }>(
+  '../../assets/gallery/*/*.jpg',
+  { eager: true },
+);
+
+function galleryFor(folder: string) {
+  return Object.entries(galleryModules)
+    .filter(([path]) => path.includes(`/gallery/${folder}/`))
+    .map(([, mod]) => ({ src: mod.default, alt: `${service.data.title} — photo` }));
+}
+
+// Chaque service peut afficher soit une petite galerie tournante, soit une
+// photo unique. À adapter si de nouveaux services/photos sont ajoutés.
+const galleryByService: Record<string, { src: ImageMetadata; alt: string }[]> = {
+  mentoring: galleryFor('mentoring'),
+  'coaching-apnee': galleryFor('stage-apnee'),
+};
+const singleImageByService: Record<string, ImageMetadata> = {
+  hyperbare: hyperbareImage,
+  'banque-images': banqueImagesImage,
+};
+
+const gallery = galleryByService[service.id];
+const singleImage = singleImageByService[service.id];
 ---
 
 <BaseLayout title={service.data.title} description={service.data.tagline}>
@@ -24,6 +54,18 @@ const { Content } = await render(service);
       <Content />
     </div>
 
+    {gallery && gallery.length > 0 && (
+      <div class="mt-10">
+        <Carousel id={service.id} images={gallery} height="360px" duration={4} />
+      </div>
+    )}
+
+    {singleImage && (
+      <div class="mt-10 overflow-hidden rounded-lg">
+        <Image src={singleImage} alt={service.data.title} widths={[480, 800, 1200]} sizes="(min-width: 1024px) 800px, 100vw" />
+      </div>
+    )}
+
     {service.data.formules.length > 0 && (
       <div class="mt-12">
         <h2 class="font-display mb-6 text-2xl font-semibold text-ivory">Formules</h2>
@@ -34,6 +76,7 @@ const { Content } = await render(service);
               description={formule.description}
               prix={formule.prix}
               cta={formule.cta}
+              lien={formule.lien}
             />
           ))}
         </div>
