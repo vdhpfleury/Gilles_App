@@ -1,0 +1,96 @@
+---
+/*
+ * Globe interactif des expéditions (WebGL via cobe, chargé à la demande).
+ * Fonctionnalité en réserve : à n'afficher que derrière PUBLIC_ENABLE_GLOBE (voir README).
+ * La liste de boutons porte toute l'information ; le globe n'est qu'une illustration
+ * (canvas aria-hidden) et la liste reste utilisable sans WebGL ni JavaScript.
+ */
+import { expeditions, typeLabels } from '../data/expeditions';
+import './ExpeditionsGlobe.css';
+
+interface Props {
+  id?: string;
+}
+
+const { id = 'expeditions' } = Astro.props;
+const titleId = `${id}-titre`;
+---
+
+<section id={id} data-globe aria-labelledby={titleId} class="globe-section">
+  <div class="globe-intro" data-reveal>
+    <p class="globe-eyebrow">Terrains d'exploration</p>
+    <h2 id={titleId} class="globe-title">Des fjords glacés aux abysses caribéens</h2>
+    <p class="globe-lead">
+      Expéditions, plongées scientifiques et stages d'apnée sous glace : les lieux où mes plongées et
+      mes missions m'ont conduit.
+    </p>
+  </div>
+
+  <div class="globe-layout">
+    <div class="globe-stage" data-globe-stage data-reveal>
+      <div class="globe-backdrop" aria-hidden="true"></div>
+      <canvas class="globe-canvas" data-globe-canvas aria-hidden="true"></canvas>
+      <div class="globe-halos" aria-hidden="true">
+        {expeditions.map((e) => (
+          <span class="globe-halo" data-globe-halo>
+            <span class="globe-halo__label">{e.lieu}</span>
+          </span>
+        ))}
+      </div>
+      <p class="globe-hint" aria-hidden="true">Glisser pour faire tourner</p>
+    </div>
+
+    <div class="globe-panel" data-reveal>
+      <ul class="globe-list" aria-label="Lieux d'expédition et de stage">
+        {expeditions.map((e, i) => (
+          <li>
+            <button
+              type="button"
+              class="globe-item"
+              data-globe-item
+              data-lat={e.lat}
+              data-lng={e.lng}
+              aria-pressed="false"
+              aria-controls={`${id}-detail-${i}`}
+            >
+              <span class="globe-item__num" aria-hidden="true">{String(i + 1).padStart(2, '0')}</span>
+              <span class="globe-item__text">
+                <span class="globe-item__lieu">{e.lieu}</span>
+                <span class="globe-item__meta">{typeLabels[e.type]}</span>
+              </span>
+              <span class="globe-item__dot" aria-hidden="true"></span>
+            </button>
+          </li>
+        ))}
+      </ul>
+
+      <div class="globe-detail" aria-live="polite">
+        <p class="globe-placeholder" data-globe-placeholder>
+          Choisissez un lieu pour le situer sur le globe.
+        </p>
+        {expeditions.map((e, i) => (
+          <article id={`${id}-detail-${i}`} class="globe-detail__item" data-globe-detail>
+            <div class="globe-detail__head">
+              <p class="globe-eyebrow">{typeLabels[e.type]}</p>
+              {e.aConfirmer && <span class="globe-badge">à confirmer</span>}
+            </div>
+            <h3 class="globe-detail__titre">{e.titre}</h3>
+            <dl class="globe-detail__facts">
+              <dt>Lieu</dt>
+              <dd>{e.lieu} · {e.region}</dd>
+              <dt>Période</dt>
+              <dd>{e.periode}</dd>
+            </dl>
+            <p class="globe-detail__desc">{e.description}</p>
+          </article>
+        ))}
+      </div>
+    </div>
+  </div>
+</section>
+
+<script>
+  import { initExpeditionsGlobe } from '../scripts/globe';
+
+  document.querySelectorAll<HTMLElement>('[data-globe]').forEach(initExpeditionsGlobe);
+</script>

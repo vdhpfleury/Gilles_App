@@ -1,11 +1,26 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
+import DepthBanner from '../components/DepthBanner.astro';
 import { Image } from 'astro:assets';
 import portrait from '../assets/images/portrait.jpg';
+import headerImage from '../assets/images/qui-suis-je-header.jpg';
+
+// Globe des expéditions : fonctionnalité en réserve (voir README). Import dynamique sous
+// condition : avec le flag désactivé, ni le script ni le CSS du composant ne sont émis.
+const ExpeditionsGlobe =
+  import.meta.env.PUBLIC_ENABLE_GLOBE === 'true'
+    ? (await import('../components/ExpeditionsGlobe.astro')).default
+    : null;
 ---
 
 <BaseLayout title="Qui suis-je ?" description="Apnéiste professionnel, biologiste marin, plongeur scientifique et astronaute analogue.">
-  <section class="mx-auto max-w-5xl px-6 py-16">
+  <DepthBanner
+    image={headerImage}
+    alt="Gorgones blanches au premier plan et banc de poissons dans le bleu profond d'un récif"
+    depthSrc="/3d/qui-suis-je-header-depth.webp"
+  />
+
+  <section class="relative mx-auto -mt-16 max-w-5xl px-6 pb-16 md:-mt-20">
     <div class="flex flex-col gap-10 md:flex-row md:items-start">
       <Image
         src={portrait}
@@ -66,4 +81,6 @@ import portrait from '../assets/images/portrait.jpg';
       </p>
     </div>
   </section>
+
+  {ExpeditionsGlobe && <ExpeditionsGlobe />}
 </BaseLayout>

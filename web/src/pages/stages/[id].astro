@@ -2,8 +2,10 @@
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import PricingCard from '../../components/PricingCard.astro';
 import Carousel from '../../components/Carousel.astro';
+import DepthBanner from '../../components/DepthBanner.astro';
 import { getCollection, render } from 'astro:content';
 import type { ImageMetadata } from 'astro';
+import stageGlaceHeader from '../../assets/images/stage-glace-header.jpg';
 
 export async function getStaticPaths() {
   const stages = await getCollection('stages');
@@ -36,10 +38,23 @@ const galleryByStage: Record<string, { src: ImageMetadata; alt: string }[]> = {
 };
 
 const gallery = galleryByStage[stage.id];
+
+// Bandeau "photo en relief" en tête de certains stages (photo + carte de profondeur alignée,
+// blanc = proche, dans public/3d/ ; voir data-depth-photo dans src/scripts/motion.ts).
+const headerByStage: Record<string, { src: ImageMetadata; alt: string; depthSrc: string }> = {
+  'apnee-sous-glace': {
+    src: stageGlaceHeader,
+    alt: 'Apnéiste glissant entre deux parois de glace, sous la banquise',
+    depthSrc: '/3d/stage-glace-header-depth.webp',
+  },
+};
+
+const header = headerByStage[stage.id];
 ---
 
 <BaseLayout title={stage.data.title}>
-  <section class="mx-auto max-w-4xl px-6 py-16">
+  {header && <DepthBanner image={header.src} alt={header.alt} depthSrc={header.depthSrc} />}
+  <section class:list={['mx-auto max-w-4xl px-6', header ? 'relative -mt-16 pb-16 md:-mt-20' : 'py-16']}>
     <div data-reveal>
       <p class="text-sm font-semibold tracking-widest text-lagon uppercase">{stage.data.niveau}</p>
       <h1 class="font-display mt-2 mb-8 text-4xl font-semibold text-ivory">{stage.data.title}</h1>

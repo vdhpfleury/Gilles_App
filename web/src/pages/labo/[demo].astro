@@ -1,0 +1,38 @@
+---
+/*
+ * Pages de démonstration de fonctionnalités en réserve (non publiées).
+ * /labo/globe/ n'est générée que si PUBLIC_ENABLE_GLOBE=true : sinon getStaticPaths() ne
+ * renvoie rien, et ni la page ni le JavaScript du globe n'arrivent dans le build.
+ * Voir « Fonctionnalités en réserve » dans le README.
+ */
+import BaseLayout from '../../layouts/BaseLayout.astro';
+
+export function getStaticPaths() {
+  return import.meta.env.PUBLIC_ENABLE_GLOBE === 'true' ? [{ params: { demo: 'globe' } }] : [];
+}
+
+// Import dynamique sous condition (et non `import` statique) : avec le flag désactivé, la
+// branche est éliminée au build et le script/CSS du composant ne sont pas émis.
+const ExpeditionsGlobe =
+  import.meta.env.PUBLIC_ENABLE_GLOBE === 'true'
+    ? (await import('../../components/ExpeditionsGlobe.astro')).default
+    : null;
+---
+
+<BaseLayout
+  title="Globe des expéditions (démo)"
+  description="Démonstration : globe interactif des expéditions et stages de Gilles Gambini."
+  noindex
+>
+  {/* Classes du composant (ExpeditionsGlobe.css) : aucune classe utilitaire propre à cette
+      page, pour que le CSS du site reste identique quand le flag est désactivé. */}
+  <section class="globe-section globe-section--intro">
+    <p data-reveal class="globe-eyebrow">Labo · aperçu</p>
+    <h1 data-reveal class="globe-title">Globe des expéditions</h1>
+    <p data-reveal class="globe-lead globe-intro">
+      Aperçu d'une section qui pourrait rejoindre la page « Qui suis-je ». Les lieux reprennent ceux
+      déjà cités sur le site ; dates, lieux précis et missions restent à compléter.
+    </p>
+  </section>
+  {ExpeditionsGlobe && <ExpeditionsGlobe />}
+</BaseLayout>

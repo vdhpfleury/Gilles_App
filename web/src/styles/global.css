@@ -1,4 +1,7 @@
 @import "tailwindcss";
+/* Tailwind v4 scanne automatiquement le projet : sans cette exclusion, l'option `filter:` du
+   sitemap dans astro.config.mjs génère une classe utilitaire `.filter` inutile. */
+@source not "../../astro.config.mjs";
 @plugin "@tailwindcss/typography";
 
 /* Polices auto-hébergées (évite la dépendance à fonts.googleapis.com) */
@@ -61,6 +64,155 @@ body {
     visibility: visible !important;
     opacity: 1 !important;
     transform: none !important;
+  }
+}
+
+/* ------------------------------------------------------------------------ */
+/* « La descente » (accueil) — pilotée par src/scripts/descent.ts           */
+/* ------------------------------------------------------------------------ */
+
+/* Calque d'eau fixe derrière tout le contenu (z-index -1, sous le flux normal ; le hero,
+   opaque, reste devant). Absent du rendu tant que descent.ts ne l'a pas placé (il démarre
+   une fois la page chargée, pour ne rien coûter au premier affichage), puis fondu d'entrée.
+   Sans JS : jamais affiché, la page garde son fond encre. */
+.descent {
+  display: none;
+}
+
+.descent-ready .descent {
+  position: fixed;
+  inset: 0 0 auto;
+  z-index: -1;
+  display: block;
+  height: 100lvh;
+  overflow: hidden;
+  contain: strict;
+  pointer-events: none;
+  animation: descent-in 900ms ease both;
+}
+
+@keyframes descent-in {
+  from {
+    opacity: 0;
+  }
+}
+
+/* Plus haut que l'écran de --fade (hauteur du fondu, définie une seule fois : FADE dans
+   descent.ts, qui pose la variable). Son bord haut, en fondu depuis l'encre, suit le bas du
+   hero (translateY écrit par descent.ts) puis sort par le haut une fois sous la surface. Le
+   fondu ne part pas de 0 mais de 5 % : le bas du hero (encre à 95 % sur la photo) est un
+   rien plus clair que l'encre seule, ce qui laissait une fine bande sombre à la jonction. */
+.descent__layer {
+  position: absolute;
+  inset: 0 0 auto;
+  height: calc(100% + var(--fade));
+  mask-image: linear-gradient(to bottom, rgb(0 0 0 / 0.05), #000 var(--fade));
+  will-change: transform;
+}
+
+/* L'eau : un bleu de surface uni dont descent.ts baisse l'opacité avec la profondeur, ce qui
+   laisse paraître l'encre de la page (#0b0f14) en dessous. Fondu entièrement composité :
+   pas de repeinture pendant le défilement. Pire cas de contraste = la surface (#0c2f4a). */
+.descent__water,
+.descent__glow {
+  position: absolute;
+  inset: 0;
+  will-change: opacity;
+}
+
+.descent__water {
+  background-color: #0c2f4a;
+}
+
+/* Lueur venue de la surface, qui s'éteint dans les premiers mètres (opacité écrite par
+   descent.ts). */
+.descent__glow {
+  background: radial-gradient(130% 55% at 50% var(--fade), rgb(79 138 141 / 0.06), transparent 75%);
+}
+
+/* Bulles : au repos et masquées tant que le hero occupe l'écran (rien ne bouge sous le
+   hero ni ne lui prend de temps de rendu), puis elles montent une fois la descente
+   commencée, et s'arrêtent de nouveau en profondeur (data-state écrit par descent.ts). */
+.descent__bubbles {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  transition: opacity 800ms ease;
+}
+
+.descent__bubbles[data-state="on"] {
+  opacity: 1;
+}
+
+/* Une seule animation (transform, composité) par bulle : la montée et un léger balancement
+   latéral. Chaque bulle est une colonne pleine hauteur du calque, la bulle dessinée juste
+   sous son bas : translateY(-100 %) lui fait donc parcourir exactement le calque, quelle que
+   soit --fade, sans var() dans les keyframes (qui obligerait Chrome à recalculer le style
+   des bulles à chaque image). La densité baisse avec la profondeur : descent.ts marque
+   [data-gone] une part croissante des bulles, qui s'effacent en fondu ; plus aucune vers
+   85 % de la descente. */
+.descent__bubble {
+  position: absolute;
+  inset-block: 0;
+  width: var(--size);
+  opacity: 0.55;
+  transition: opacity 1.2s ease;
+  animation: descent-rise var(--rise) linear var(--delay) infinite;
+  animation-play-state: paused;
+  will-change: transform;
+}
+
+.descent__bubble::before {
+  content: "";
+  position: absolute;
+  top: 100%;
+  left: 0;
+  width: var(--size);
+  height: var(--size);
+  border: 1px solid rgb(244 241 234 / 0.5);
+  border-radius: 50%;
+  background: radial-gradient(circle at 32% 30%, rgb(255 255 255 / 0.55), rgb(255 255 255 / 0.06) 55%, transparent 72%);
+}
+
+.descent__bubble[data-gone] {
+  opacity: 0;
+}
+
+.descent__bubbles[data-state="on"] .descent__bubble {
+  animation-play-state: running;
+}
+
+/* Course : la hauteur de la colonne (= celle du calque) plus la taille maximale d'une bulle. */
+@keyframes descent-rise {
+  25% {
+    transform: translate3d(0.375rem, calc(-25% - 0.1875rem), 0);
+  }
+  50% {
+    transform: translate3d(0, calc(-50% - 0.375rem), 0);
+  }
+  75% {
+    transform: translate3d(-0.375rem, calc(-75% - 0.5625rem), 0);
+  }
+  to {
+    transform: translate3d(0, calc(-100% - 0.75rem), 0);
+  }
+}
+
+/* Mouvement réduit : la couleur et la jauge suivent toujours le défilement (aucun mouvement
+   autonome), mais pas de bulles ni de fondu. */
+@media (prefers-reduced-motion: reduce) {
+  .descent-ready .descent {
+    animation: none;
+  }
+
+  .descent__bubbles {
+    display: none;
+  }
+}
+
+@media print {
+  .descent {
+    display: none !important;
   }
 }
 
