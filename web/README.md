@@ -38,6 +38,7 @@ npm run preview   # sert le build de production
       cartes et boutons "magnétiques" à la souris, soulignement animé de la navigation ;
       `prefers-reduced-motion` respecté, contenu lisible sans JavaScript. Menu mobile
       accessible et liens Facebook/Instagram/LinkedIn dans le hero, sur Contact et en pied de page
+- [x] « Photo en relief » WebGL (desktop, `src/scripts/hero3d.ts`) réutilisable via `data-depth-photo` + `data-depth-src` (option `data-depth-bubbles`, `data-depth-caustics`) : hero, bandeaux de « Qui suis-je » et du stage sous glace ; cartes de profondeur `public/3d/*-depth.webp` (blanc = proche) livrées déjà floutées (Gaussien σ = 12 px sur 1200 px de large) ; globe des expéditions affiché en fin de « Qui suis-je » si `PUBLIC_ENABLE_GLOBE=true`
 
 ## SEO & performance
 

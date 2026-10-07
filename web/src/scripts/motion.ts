@@ -4,6 +4,9 @@ import { gsap } from 'gsap';
  * Motion design, driven by data attributes (anti-flash rules live in global.css):
  * - [data-hero] / [data-hero-item] / [data-parallax]: hero entrance + scrubbed parallax
  * - [data-hero-media]: WebGL "living photo" over the hero image (hero3d.ts, desktop only)
+ * - [data-depth-photo]: the same "photo en relief" on another photo, mounted when it nears the
+ *   viewport. Needs data-depth-src (depth map URL, near = white); options: data-depth-bubbles,
+ *   data-depth-caustics="0..1" (default 0.6; the hero uses 1). The <img> inside stays the fallback.
  * - [data-reveal]: fade + slide-up the first time a block enters the viewport
  * - [data-tilt]: pointer-following 3D tilt (mouse only)
  * - [data-magnetic]: cursor-attracted buttons/links (mouse only)
@@ -151,7 +154,8 @@ function setupMagnetic(el: HTMLElement) {
 
 type NavigatorWithConnection = Navigator & { connection?: { saveData?: boolean } };
 
-const HERO_3D_QUERY = '(min-width: 1024px) and (pointer: fine)';
+const DEPTH_PHOTO_QUERY = '(min-width: 1024px) and (pointer: fine)';
+const HERO_DEPTH_SRC = '/3d/hero-wave-depth.webp';
 
 /** Runs `fn` once the page has loaded and the main thread is idle, so it never competes with the LCP. */
 function whenIdleAfterLoad(fn: () => void) {
@@ -164,25 +168,30 @@ function whenIdleAfterLoad(fn: () => void) {
   else window.addEventListener('load', schedule, { once: true });
 }
 
+interface DepthPhotoSettings {
+  depthSrc: string;
+  bubbles: boolean;
+  caustics: number;
+}
+
 /**
- * WebGL "living photo" over the hero image: large screens with a mouse, motion and data allowed.
- * Mounted when idle after load, and again after a back/forward-cache restore (hero3d tears
- * itself down on pagehide) or when the window grows back past the breakpoint.
+ * One WebGL "living photo" (hero3d.ts) over the <img> inside `wrapper`: mounted when idle after
+ * load once the photo nears the viewport, and again after a back/forward-cache restore (hero3d
+ * tears itself down on pagehide) or when the window grows back past the breakpoint.
  */
-function initHero3D() {
-  const hero = document.querySelector<HTMLElement>('[data-hero]');
-  const wrapper = hero?.querySelector<HTMLElement>('[data-hero-media]');
-  const img = wrapper?.querySelector('img');
-  const query = window.matchMedia(HERO_3D_QUERY);
-  const saveData = (navigator as NavigatorWithConnection).connection?.saveData === true;
-  if (!hero || !wrapper || !img || reduceMotion || saveData) return;
+function setupDepthPhoto(wrapper: HTMLElement, query: MediaQueryList, settings: DepthPhotoSettings) {
+  const img = wrapper.querySelector('img');
+  if (!img) return;
+  // Pointer reference and visibility target: the whole hero section, or the photo itself.
+  const frame = wrapper.closest<HTMLElement>('[data-hero]') ?? wrapper;
 
   // True from the start of a mount until its teardown: never two canvases at once.
   let active = false;
+  let near = false;
   let teardown: (() => void) | null = null;
 
   const mount = async () => {
-    if (active || !query.matches) return;
+    if (active || !near || !query.matches) return;
     active = true;
     // The probe context is the one hero3d renders with: the chunk is only fetched if WebGL works.
     const canvas = document.createElement('canvas');
@@ -195,9 +204,10 @@ function initHero3D() {
     });
     if (!gl) return; // stays "active": without WebGL there is nothing to retry
 
-    const { mountHero3D } = await import('./hero3d');
-    teardown = await mountHero3D({
-      hero,
+    const { mountDepthPhoto } = await import('./hero3d');
+    teardown = await mountDepthPhoto({
+      ...settings,
+      frame,
       wrapper,
       img,
       canvas,
@@ -216,13 +226,41 @@ function initHero3D() {
     });
   };
 
-  whenIdleAfterLoad(tryMount);
+  const observer = new IntersectionObserver(
+    ([entry]) => {
+      near = entry.isIntersecting;
+      tryMount();
+    },
+    { rootMargin: '25% 0px' },
+  );
+  whenIdleAfterLoad(() => observer.observe(wrapper));
   window.addEventListener('pageshow', (event) => {
     if (event.persisted) whenIdleAfterLoad(tryMount);
   });
   query.addEventListener('change', (event) => {
     if (event.matches) tryMount();
     else teardown?.();
+  });
+}
+
+/** "Living photos": large screens with a mouse, motion and data allowed; the photos stay otherwise. */
+function initDepthPhotos() {
+  const saveData = (navigator as NavigatorWithConnection).connection?.saveData === true;
+  if (reduceMotion || saveData || !('IntersectionObserver' in window)) return;
+  const query = window.matchMedia(DEPTH_PHOTO_QUERY);
+
+  const hero = document.querySelector<HTMLElement>('[data-hero] [data-hero-media]:not([data-depth-photo])');
+  if (hero) setupDepthPhoto(hero, query, { depthSrc: HERO_DEPTH_SRC, bubbles: true, caustics: 1 });
+
+  document.querySelectorAll<HTMLElement>('[data-depth-photo]').forEach((wrapper) => {
+    const { depthSrc, depthBubbles, depthCaustics } = wrapper.dataset;
+    if (!depthSrc) return;
+    const caustics = Number.parseFloat(depthCaustics ?? '');
+    setupDepthPhoto(wrapper, query, {
+      depthSrc,
+      bubbles: depthBubbles !== undefined && depthBubbles !== 'false',
+      caustics: Number.isFinite(caustics) ? caustics : 0.6,
+    });
   });
 }
 
@@ -254,7 +292,7 @@ function init() {
       initParallax().catch(() => {
         // Parallax is decorative: if its chunk fails to load, the page simply stays still.
       });
-      initHero3D();
+      initDepthPhotos();
     });
   });
 }

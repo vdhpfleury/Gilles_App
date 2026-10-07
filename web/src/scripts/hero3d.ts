@@ -1,24 +1,30 @@
 /*
- * "Living photo" hero (desktop only, loaded lazily by motion.ts): the hero photo is redrawn
- * in WebGL with a depth-map parallax that follows the pointer, caustic light ripples and
- * rising bubbles. The <img> stays underneath as the LCP element and the fallback: on any
- * failure the canvas is removed and the photo is left as it was.
+ * "Living photo" (desktop only, loaded lazily by motion.ts): a photo is redrawn in WebGL with a
+ * depth-map parallax that follows the pointer, caustic light ripples and, for the home hero,
+ * rising bubbles. The <img> stays underneath (LCP element and fallback): on any failure the
+ * canvas is removed and the photo is left as it was. Used by the hero ([data-hero-media]) and by
+ * any [data-depth-photo] element (see motion.ts for the attributes).
  */
 
-export interface Hero3DOptions {
-  /** The hero section (pointer position is measured from its centre; render pauses when off screen). */
-  hero: HTMLElement;
-  /** The parallax wrapper of the photo: the canvas is appended to it, so it drifts with it. */
+export interface DepthPhotoOptions {
+  /** Pointer position is measured from its centre; render pauses when it is off screen. */
+  frame: HTMLElement;
+  /** The element holding the photo: the canvas is appended to it, so it follows its transforms. */
   wrapper: HTMLElement;
-  /** The hero photo, already downloaded: reused as the colour texture. */
+  /** The photo, already downloaded (or downloading): reused as the colour texture. */
   img: HTMLImageElement;
   canvas: HTMLCanvasElement;
   gl: WebGLRenderingContext;
+  /** Depth map aligned with the photo (near = white), blur baked in (see README). */
+  depthSrc: string;
+  /** Rising bubbles that dodge the pointer (home hero). */
+  bubbles?: boolean;
+  /** Caustics strength: 1 = home hero, 0 = none. */
+  caustics?: number;
   /** Called once torn down, whatever the cause (failure, lost context, pagehide, caller). */
   onDestroy?: () => void;
 }
 
-const DEPTH_URL = '/3d/hero-wave-depth.webp';
 const MAX_DPR = 1.5;
 /**
  * Extra zoom over object-fit: cover (+4.5%), so the displaced lookups stay inside the texture:
@@ -51,6 +57,7 @@ uniform vec2 uScale;
 uniform vec2 uOffset;
 uniform float uTime;
 uniform float uIntro;
+uniform float uCaustics;
 varying vec2 vUv;
 
 // Iterated-turbulence caustic pattern (after joltz0r's "water turbulence").
@@ -66,16 +73,10 @@ float caustic(vec2 p, float t) {
   return clamp(pow(abs(c), 8.0), 0.0, 1.0);
 }
 
-// Blurred depth: a soft edge spreads the stretch where the near plane meets the background,
-// instead of smearing the foam around the diver into streaks.
+// The depth maps ship pre-blurred (Gaussian, sigma 12 px of the 1200 px map): a soft edge
+// spreads the stretch where a near plane meets the background instead of doubling it.
 float depthAt(vec2 uv) {
-  const vec2 r = vec2(0.016, 0.024);
-  float sum = texture2D(uDepth, uv).r * 2.0;
-  sum += texture2D(uDepth, uv + vec2(r.x, 0.0)).r + texture2D(uDepth, uv - vec2(r.x, 0.0)).r;
-  sum += texture2D(uDepth, uv + vec2(0.0, r.y)).r + texture2D(uDepth, uv - vec2(0.0, r.y)).r;
-  sum += texture2D(uDepth, uv + r * 0.7).r + texture2D(uDepth, uv - r * 0.7).r;
-  sum += texture2D(uDepth, uv + vec2(r.x, -r.y) * 0.7).r + texture2D(uDepth, uv + vec2(-r.x, r.y) * 0.7).r;
-  return sum / 10.0;
+  return texture2D(uDepth, uv).r;
 }
 
 void main() {
@@ -96,7 +97,7 @@ void main() {
   // Under one 2*PI period across the photo (no visible tiling); the -250 offset sets the line width.
   float light = caustic(duv * vec2(6.0, 4.0) - 250.0, t);
   light *= 0.65 + 0.35 * sin(duv.x * 4.0 - t * 1.3 + duv.y * 3.0);
-  light *= water * uIntro;
+  light *= water * uIntro * uCaustics;
   // Partly multiplicative, so the ripples light the scene rather than sit on top of it.
   vec3 tint = mix(vec3(0.31, 0.54, 0.55), vec3(0.96, 0.95, 0.92), light);
   color = color * (1.0 + light * 0.4) + tint * light * ${CAUSTICS_INTENSITY.toFixed(3)};
@@ -201,7 +202,7 @@ interface PhotoSource {
   release: () => void;
 }
 
-/** The hero photo as a texture source (no new download), as an ImageBitmap where supported. */
+/** The photo as a texture source (no new download), as an ImageBitmap where supported. */
 async function loadPhoto(img: HTMLImageElement): Promise<PhotoSource> {
   await img.decode();
   const aspect = img.naturalWidth / img.naturalHeight;
@@ -210,10 +211,10 @@ async function loadPhoto(img: HTMLImageElement): Promise<PhotoSource> {
   return { source: bitmap, aspect, release: () => bitmap.close() };
 }
 
-async function loadDepth(): Promise<HTMLImageElement> {
+async function loadDepth(src: string): Promise<HTMLImageElement> {
   const depth = new Image();
   depth.decoding = 'async';
-  depth.src = DEPTH_URL;
+  depth.src = src;
   await depth.decode();
   return depth;
 }
@@ -248,7 +249,7 @@ interface BubbleFrame {
   width: number;
   height: number;
   intro: number;
-  /** Smoothed pointer offset, -1..1 from the hero centre. */
+  /** Smoothed pointer offset, -1..1 from the frame centre. */
   offset: Vec2;
   /** Pointer in canvas CSS pixels, or null when it is not over the page. */
   pointer: Vec2 | null;
@@ -294,10 +295,20 @@ function updateBubbles(bubbles: Bubble[], out: Float32Array, frame: BubbleFrame)
 }
 
 /**
- * Mounts the WebGL hero on top of the photo. Resolves with a teardown function; on any failure
+ * Mounts the WebGL layer on top of the photo. Resolves with a teardown function; on any failure
  * (missing depth map, shader error, lost context) the canvas is removed and the photo stays.
  */
-export async function mountHero3D({ hero, wrapper, img, canvas, gl, onDestroy }: Hero3DOptions): Promise<() => void> {
+export async function mountDepthPhoto({
+  frame,
+  wrapper,
+  img,
+  canvas,
+  gl,
+  depthSrc,
+  bubbles: withBubbles = false,
+  caustics = 1,
+  onDestroy,
+}: DepthPhotoOptions): Promise<() => void> {
   const listeners = new AbortController();
   const { signal } = listeners;
   const programs: WebGLProgram[] = [];
@@ -337,7 +348,7 @@ export async function mountHero3D({ hero, wrapper, img, canvas, gl, onDestroy }:
   wrapper.append(canvas);
 
   try {
-    const [photo, depth] = await Promise.all([loadPhoto(img), loadDepth()]);
+    const [photo, depth] = await Promise.all([loadPhoto(img), loadDepth(depthSrc)]);
     releasePhoto = photo.release;
     if (destroyed) {
       photo.release();
@@ -346,8 +357,9 @@ export async function mountHero3D({ hero, wrapper, img, canvas, gl, onDestroy }:
 
     await nextTask();
     const photoProgram = await createProgram(gl, FULLSCREEN_VS, PHOTO_FS);
-    const bubbleProgram = await createProgram(gl, BUBBLE_VS, BUBBLE_FS);
-    programs.push(photoProgram, bubbleProgram);
+    programs.push(photoProgram);
+    const bubbleProgram = withBubbles ? await createProgram(gl, BUBBLE_VS, BUBBLE_FS) : null;
+    if (bubbleProgram) programs.push(bubbleProgram);
     if (destroyed) return destroy;
 
     await nextTask();
@@ -371,7 +383,7 @@ export async function mountHero3D({ hero, wrapper, img, canvas, gl, onDestroy }:
     textureAspect,
   }: {
     photoProgram: WebGLProgram;
-    bubbleProgram: WebGLProgram;
+    bubbleProgram: WebGLProgram | null;
     textureAspect: number;
   }) {
     const [photoTexture, depthTexture] = textures;
@@ -381,16 +393,12 @@ export async function mountHero3D({ hero, wrapper, img, canvas, gl, onDestroy }:
       time: gl.getUniformLocation(photoProgram, 'uTime'),
       intro: gl.getUniformLocation(photoProgram, 'uIntro'),
     };
-    const bubbleUniforms = {
-      resolution: gl.getUniformLocation(bubbleProgram, 'uResolution'),
-      pixelRatio: gl.getUniformLocation(bubbleProgram, 'uPixelRatio'),
-    };
     const positionLocation = gl.getAttribLocation(photoProgram, 'aPosition');
-    const bubbleLocation = gl.getAttribLocation(bubbleProgram, 'aBubble');
 
     gl.useProgram(photoProgram);
     gl.uniform1i(gl.getUniformLocation(photoProgram, 'uPhoto'), 0);
     gl.uniform1i(gl.getUniformLocation(photoProgram, 'uDepth'), 1);
+    gl.uniform1f(gl.getUniformLocation(photoProgram, 'uCaustics'), caustics);
     gl.activeTexture(gl.TEXTURE0);
     gl.bindTexture(gl.TEXTURE_2D, photoTexture);
     gl.activeTexture(gl.TEXTURE1);
@@ -399,14 +407,11 @@ export async function mountHero3D({ hero, wrapper, img, canvas, gl, onDestroy }:
 
     // One oversized triangle covers the whole viewport.
     const triangleBuffer = gl.createBuffer();
-    const bubbleBuffer = gl.createBuffer();
-    if (!triangleBuffer || !bubbleBuffer) throw new Error('hero3d: createBuffer failed');
-    buffers.push(triangleBuffer, bubbleBuffer);
+    if (!triangleBuffer) throw new Error('hero3d: createBuffer failed');
+    buffers.push(triangleBuffer);
     gl.bindBuffer(gl.ARRAY_BUFFER, triangleBuffer);
     gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1, -1, 3, -1, -1, 3]), gl.STATIC_DRAW);
-    const bubbleData = new Float32Array(BUBBLE_COUNT * 4);
-    gl.bindBuffer(gl.ARRAY_BUFFER, bubbleBuffer);
-    gl.bufferData(gl.ARRAY_BUFFER, bubbleData.byteLength, gl.DYNAMIC_DRAW);
+    const drawBubbles = bubbleProgram ? createBubbleLayer(bubbleProgram) : null;
 
     let dpr = 1;
     let width = 1;
@@ -430,14 +435,14 @@ export async function mountHero3D({ hero, wrapper, img, canvas, gl, onDestroy }:
       canvas.width = Math.round(cssWidth * dpr);
       canvas.height = Math.round(cssHeight * dpr);
       gl.viewport(0, 0, canvas.width, canvas.height);
-      if (bubbles.length) bubbles.forEach((bubble) => (bubble.x *= cssWidth / width));
-      else bubbles = Array.from({ length: BUBBLE_COUNT }, () => createBubble(cssWidth, cssHeight, true));
+      if (drawBubbles && bubbles.length) bubbles.forEach((bubble) => (bubble.x *= cssWidth / width));
+      else if (drawBubbles) bubbles = Array.from({ length: BUBBLE_COUNT }, () => createBubble(cssWidth, cssHeight, true));
       width = cssWidth;
       height = cssHeight;
     }
 
     function updateOffset(dt: number) {
-      const rect = hero.getBoundingClientRect();
+      const rect = frame.getBoundingClientRect();
       const target: Vec2 = { x: 0, y: 0 };
       if (pointerOver) {
         target.x = clamp((pointerClient.x - rect.left - rect.width / 2) / (rect.width / 2), -1, 1);
@@ -479,37 +484,53 @@ export async function mountHero3D({ hero, wrapper, img, canvas, gl, onDestroy }:
       gl.vertexAttribPointer(positionLocation, 2, gl.FLOAT, false, 0, 0);
       gl.drawArrays(gl.TRIANGLES, 0, 3);
       gl.disableVertexAttribArray(positionLocation);
+    }
 
-      if (intro <= 0) return;
-      gl.enable(gl.BLEND);
-      gl.useProgram(bubbleProgram);
-      gl.uniform2f(bubbleUniforms.resolution, width, height);
-      gl.uniform1f(bubbleUniforms.pixelRatio, dpr);
-      gl.bindBuffer(gl.ARRAY_BUFFER, bubbleBuffer);
-      gl.bufferSubData(gl.ARRAY_BUFFER, 0, bubbleData);
-      gl.enableVertexAttribArray(bubbleLocation);
-      gl.vertexAttribPointer(bubbleLocation, 4, gl.FLOAT, false, 0, 0);
-      gl.drawArrays(gl.POINTS, 0, BUBBLE_COUNT);
-      gl.disableVertexAttribArray(bubbleLocation);
+    /** Bubble points drawn over the photo: returns the per-frame update + draw. */
+    function createBubbleLayer(program: WebGLProgram) {
+      const resolution = gl.getUniformLocation(program, 'uResolution');
+      const pixelRatio = gl.getUniformLocation(program, 'uPixelRatio');
+      const location = gl.getAttribLocation(program, 'aBubble');
+      const buffer = gl.createBuffer();
+      if (!buffer) throw new Error('hero3d: createBuffer failed');
+      buffers.push(buffer);
+      const data = new Float32Array(BUBBLE_COUNT * 4);
+      gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
+      gl.bufferData(gl.ARRAY_BUFFER, data.byteLength, gl.DYNAMIC_DRAW);
+
+      return (dt: number, intro: number) => {
+        updateBubbles(bubbles, data, {
+          dt,
+          time,
+          width,
+          height,
+          intro,
+          offset,
+          pointer: pointerInCanvas(),
+          maxSize: maxPointSize / dpr,
+        });
+        if (intro <= 0) return;
+        gl.enable(gl.BLEND);
+        gl.useProgram(program);
+        gl.uniform2f(resolution, width, height);
+        gl.uniform1f(pixelRatio, dpr);
+        gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
+        gl.bufferSubData(gl.ARRAY_BUFFER, 0, data);
+        gl.enableVertexAttribArray(location);
+        gl.vertexAttribPointer(location, 4, gl.FLOAT, false, 0, 0);
+        gl.drawArrays(gl.POINTS, 0, BUBBLE_COUNT);
+        gl.disableVertexAttribArray(location);
+      };
     }
 
     function render(dt: number) {
       const intro = firstFrameAt < 0 ? 0 : smoothstep((time - firstFrameAt - INTRO_DELAY) / INTRO_DURATION);
       updateOffset(dt);
-      updateBubbles(bubbles, bubbleData, {
-        dt,
-        time,
-        width,
-        height,
-        intro,
-        offset,
-        pointer: pointerInCanvas(),
-        maxSize: maxPointSize / dpr,
-      });
       draw(intro);
+      drawBubbles?.(dt, intro);
     }
 
-    function frame(now: number) {
+    function tick(now: number) {
       rafId = 0;
       const dt = clamp((now - lastNow) / 1000, 0, 1 / 20);
       lastNow = now;
@@ -525,7 +546,7 @@ export async function mountHero3D({ hero, wrapper, img, canvas, gl, onDestroy }:
 
     function schedule() {
       if (destroyed || !inView || !visible || rafId) return;
-      rafId = requestAnimationFrame(frame);
+      rafId = requestAnimationFrame(tick);
     }
 
     function updateRunning() {
@@ -569,6 +590,6 @@ export async function mountHero3D({ hero, wrapper, img, canvas, gl, onDestroy }:
       inView = entry.isIntersecting;
       updateRunning();
     });
-    intersectionObserver.observe(hero);
+    intersectionObserver.observe(frame);
   }
 }
