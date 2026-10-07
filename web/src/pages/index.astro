@@ -24,18 +24,20 @@ const interviews = [
 
 <BaseLayout title="Accueil">
   <section data-hero class="relative overflow-hidden">
-    {/* Légèrement agrandie (scale) pour que le parallaxe ne découvre jamais un bord. */}
-    <Image
-      src={heroImage}
-      alt="Gilles Gambini en apnée, émergeant sous une vague"
-      data-parallax
-      class="absolute inset-0 h-full w-full scale-[1.1] object-cover"
-      widths={[640, 1024, 1600, 2000]}
-      sizes="100vw"
-      quality={80}
-      loading="eager"
-      fetchpriority="high"
-    />
+    {/* Légèrement agrandie (scale) pour que le parallaxe ne découvre jamais un bord.
+        Le wrapper porte le parallaxe : le canvas WebGL du hero (hero3d.ts, desktop) y est ajouté. */}
+    <div data-parallax data-hero-media class="absolute inset-0 scale-[1.1]">
+      <Image
+        src={heroImage}
+        alt="Gilles Gambini en apnée, émergeant sous une vague"
+        class="absolute inset-0 h-full w-full object-cover"
+        widths={[640, 1024, 1600, 2000]}
+        sizes="100vw"
+        quality={80}
+        loading="eager"
+        fetchpriority="high"
+      />
+    </div>
     <div class="absolute inset-0 bg-gradient-to-b from-ink/55 to-ink/95"></div>
     <div class="relative mx-auto flex min-h-[70vh] max-w-6xl flex-col justify-end gap-6 px-6 py-20">
       <p data-hero-item class="text-sm font-semibold tracking-widest text-lagon uppercase [text-shadow:0_1px_10px_rgb(0_0_0/0.85)]">

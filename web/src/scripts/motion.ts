@@ -3,6 +3,7 @@ import { gsap } from 'gsap';
 /*
  * Motion design, driven by data attributes (anti-flash rules live in global.css):
  * - [data-hero] / [data-hero-item] / [data-parallax]: hero entrance + scrubbed parallax
+ * - [data-hero-media]: WebGL "living photo" over the hero image (hero3d.ts, desktop only)
  * - [data-reveal]: fade + slide-up the first time a block enters the viewport
  * - [data-tilt]: pointer-following 3D tilt (mouse only)
  * - [data-magnetic]: cursor-attracted buttons/links (mouse only)
@@ -148,6 +149,83 @@ function setupMagnetic(el: HTMLElement) {
   });
 }
 
+type NavigatorWithConnection = Navigator & { connection?: { saveData?: boolean } };
+
+const HERO_3D_QUERY = '(min-width: 1024px) and (pointer: fine)';
+
+/** Runs `fn` once the page has loaded and the main thread is idle, so it never competes with the LCP. */
+function whenIdleAfterLoad(fn: () => void) {
+  const schedule = () => {
+    // Safari has no requestIdleCallback.
+    if (typeof window.requestIdleCallback === 'function') window.requestIdleCallback(fn, { timeout: 4000 });
+    else setTimeout(fn, 1200);
+  };
+  if (document.readyState === 'complete') schedule();
+  else window.addEventListener('load', schedule, { once: true });
+}
+
+/**
+ * WebGL "living photo" over the hero image: large screens with a mouse, motion and data allowed.
+ * Mounted when idle after load, and again after a back/forward-cache restore (hero3d tears
+ * itself down on pagehide) or when the window grows back past the breakpoint.
+ */
+function initHero3D() {
+  const hero = document.querySelector<HTMLElement>('[data-hero]');
+  const wrapper = hero?.querySelector<HTMLElement>('[data-hero-media]');
+  const img = wrapper?.querySelector('img');
+  const query = window.matchMedia(HERO_3D_QUERY);
+  const saveData = (navigator as NavigatorWithConnection).connection?.saveData === true;
+  if (!hero || !wrapper || !img || reduceMotion || saveData) return;
+
+  // True from the start of a mount until its teardown: never two canvases at once.
+  let active = false;
+  let teardown: (() => void) | null = null;
+
+  const mount = async () => {
+    if (active || !query.matches) return;
+    active = true;
+    // The probe context is the one hero3d renders with: the chunk is only fetched if WebGL works.
+    const canvas = document.createElement('canvas');
+    const gl = canvas.getContext('webgl', {
+      alpha: false,
+      antialias: false,
+      depth: false,
+      stencil: false,
+      powerPreference: 'low-power',
+    });
+    if (!gl) return; // stays "active": without WebGL there is nothing to retry
+
+    const { mountHero3D } = await import('./hero3d');
+    teardown = await mountHero3D({
+      hero,
+      wrapper,
+      img,
+      canvas,
+      gl,
+      onDestroy: () => {
+        active = false;
+      },
+    });
+    if (!query.matches) teardown();
+  };
+
+  const tryMount = () => {
+    mount().catch(() => {
+      // Decorative: if the chunk fails to load, the photo simply stays (a later trigger may retry).
+      active = false;
+    });
+  };
+
+  whenIdleAfterLoad(tryMount);
+  window.addEventListener('pageshow', (event) => {
+    if (event.persisted) whenIdleAfterLoad(tryMount);
+  });
+  query.addEventListener('change', (event) => {
+    if (event.matches) tryMount();
+    else teardown?.();
+  });
+}
+
 /** Tilt and magnetic effects (mouse only): nothing runs until the pointer first enters. */
 function initPointerEffects() {
   if (reduceMotion || !finePointer) return;
@@ -176,6 +254,7 @@ function init() {
       initParallax().catch(() => {
         // Parallax is decorative: if its chunk fails to load, the page simply stays still.
       });
+      initHero3D();
     });
   });
 }
