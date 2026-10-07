@@ -28,11 +28,15 @@ export interface DepthPhotoOptions {
 const MAX_DPR = 1.5;
 /**
  * Extra zoom over object-fit: cover (+4.5%), so the displaced lookups stay inside the texture:
- * per-side margin (1 - 1 / 1.045) / 2 ≈ 2.15% > max vertical displacement (1.9%) + shimmer.
+ * per-side margin (1 - 1 / 1.045) / 2 ≈ 2.15% > max vertical displacement (1.95%) + shimmer.
  */
 const ZOOM_EXTRA = 0.045;
-/** Max displacement = 0.5 * DEPTH_STRENGTH = 1.25% of the texture width (more doubles edges). */
-const DEPTH_STRENGTH = 0.025;
+/**
+ * The nearest plane (white, the subject) is the pivot and stays still, so faces are never
+ * warped; the background slides behind it by up to DEPTH_STRENGTH = 1.3% of the texture width
+ * (more doubles edges).
+ */
+const DEPTH_STRENGTH = 0.013;
 const CAUSTICS_INTENSITY = 0.12;
 const POINTER_SMOOTHING = 0.06;
 const BUBBLE_COUNT = 90;
@@ -82,9 +86,10 @@ float depthAt(vec2 uv) {
 void main() {
   vec2 uv = (vUv - 0.5) * uScale + 0.5;
   // Two fixed-point steps approximate the inverse displacement: fewer doubled edges.
+  // Pivot on the nearest plane (depth 1): the subject stays put, only what is behind it moves.
   float depth = depthAt(uv);
-  depth = depthAt(clamp(uv + (depth - 0.5) * uOffset, 0.0, 1.0));
-  vec2 duv = uv + (depth - 0.5) * uOffset;
+  depth = depthAt(clamp(uv + (depth - 1.0) * uOffset, 0.0, 1.0));
+  vec2 duv = uv + (depth - 1.0) * uOffset;
 
   // Open water only (not the diver nor the foam at the surface), fading with depth in the frame.
   float water = (1.0 - smoothstep(0.45, 0.9, depth)) * mix(1.0, 0.45, smoothstep(0.3, 1.0, vUv.y));
