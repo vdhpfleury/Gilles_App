@@ -14,8 +14,8 @@
  * Sans JavaScript, rien de tout cela n'est affiché (cf. global.css) : la page reste sur l'encre.
  */
 
-/** Hauteur (px) du fondu entre le bas du hero et l'eau ; reprise par global.css via --fade
- *  (et en dur, 15rem, dans les keyframes descent-rise). */
+/** Hauteur (px) du fondu entre le bas du hero et l'eau : seule définition, transmise à
+ *  global.css par la variable --fade (posée sur le calque avant son affichage). */
 const FADE = 240;
 
 /**
@@ -177,11 +177,11 @@ function init() {
 
 // Effet d'ambiance : il démarre une fois la page chargée et le fil principal libre, pour ne
 // rien retirer au premier affichage ni à l'entrée du hero.
-const start = () => {
+const scheduleInit = () => {
   // Repli pour les navigateurs sans requestIdleCallback (Safari).
   if (typeof requestIdleCallback === 'function') requestIdleCallback(init, { timeout: 1500 });
   else setTimeout(init, 200);
 };
 
-if (document.readyState === 'complete') start();
-else window.addEventListener('load', start, { once: true });
+if (document.readyState === 'complete') scheduleInit();
+else window.addEventListener('load', scheduleInit, { once: true });
