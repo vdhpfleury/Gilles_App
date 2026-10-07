@@ -13,7 +13,11 @@ const isExternal = Boolean(lien);
 const ctaHref = lien || '/contact';
 ---
 
-<div class="flex flex-col gap-3 rounded-lg border border-white/15 bg-white/[0.03] p-6">
+<div
+  data-reveal
+  data-tilt
+  class="flex flex-col gap-3 rounded-lg border border-white/15 bg-white/[0.03] p-6 transition-[border-color,box-shadow] duration-300 hover:border-lagon/60 hover:shadow-[0_24px_60px_-28px_rgb(79_138_141/0.55)]"
+>
   {eyebrow && (
     <p class="text-xs font-semibold tracking-widest text-lagon uppercase">{eyebrow}</p>
   )}
@@ -25,7 +29,8 @@ const ctaHref = lien || '/contact';
       href={ctaHref}
       target={isExternal ? '_blank' : undefined}
       rel={isExternal ? 'noopener' : undefined}
-      class="mt-2 inline-block rounded-sm bg-lagon px-5 py-2.5 text-center text-xs font-semibold tracking-widest text-ink uppercase hover:opacity-90"
+      data-magnetic
+      class="mt-2 inline-block rounded-sm bg-lagon px-5 py-2.5 text-center text-xs font-semibold tracking-widest text-ink uppercase transition-colors hover:bg-ivory"
     >
       {cta}
     </a>

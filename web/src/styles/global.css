@@ -26,3 +26,183 @@ body {
   background-color: var(--color-ink);
   color: var(--color-ivory);
 }
+
+/* ------------------------------------------------------------------------ */
+/* Motion design — piloté par src/scripts/motion.ts (GSAP + ScrollTrigger)  */
+/* ------------------------------------------------------------------------ */
+
+/* Anti-flash : le hero et les blocs [data-reveal] sont masqués dès le premier
+   rendu, mais seulement quand JS est actif (classe .js posée dans <head>) et
+   tant que motion.ts n'a pas pris la main (il pose alors .motion-ready et GSAP
+   gère l'état via des styles inline). Sans JS, rien n'est masqué. Filet de
+   sécurité : si le script de motion ne s'exécute jamais, tout réapparaît
+   après 3 s. */
+.js:not(.motion-ready) [data-hero-item] {
+  visibility: hidden;
+  animation: motion-failsafe 0s linear 3s forwards;
+}
+
+.js:not(.motion-ready) [data-reveal] {
+  opacity: 0;
+  animation: motion-failsafe 0.6s ease 3s forwards;
+}
+
+@keyframes motion-failsafe {
+  to {
+    visibility: visible;
+    opacity: 1;
+  }
+}
+
+/* À l'impression, tout ce qui n'a pas encore été révélé doit apparaître. */
+@media print {
+  [data-hero-item],
+  [data-reveal] {
+    visibility: visible !important;
+    opacity: 1 !important;
+    transform: none !important;
+  }
+}
+
+@layer components {
+  /* Liens de navigation desktop : soulignement animé (entre par la gauche,
+     sort par la droite), affiché en permanence sur la page active. */
+  .nav-link {
+    position: relative;
+    display: inline-block;
+    padding-block: 0.25rem;
+  }
+
+  .nav-link::after {
+    content: "";
+    position: absolute;
+    inset-inline: 0;
+    bottom: 0;
+    height: 1px;
+    background-color: var(--color-lagon);
+    transform: scaleX(0);
+    transform-origin: right center;
+    transition: transform 300ms cubic-bezier(0.65, 0, 0.35, 1);
+  }
+
+  .nav-link:hover::after,
+  .nav-link:focus-visible::after,
+  .nav-link[aria-current="page"]::after {
+    transform: scaleX(1);
+    transform-origin: left center;
+  }
+
+  /* Bouton du menu mobile : affiché seulement si JS est actif (sinon le
+     panneau reste ouvert, voir plus bas) et sous le point de rupture md. */
+  .menu-toggle {
+    display: none;
+  }
+
+  .js .menu-toggle {
+    display: inline-flex;
+  }
+
+  @media (width >= 48rem) {
+    .js .menu-toggle {
+      display: none;
+    }
+  }
+
+  /* Icône "burger" à deux traits qui se croisent en X à l'ouverture. */
+  .menu-icon {
+    position: relative;
+    display: block;
+    width: 1.125rem;
+    height: 0.625rem;
+  }
+
+  .menu-icon > span {
+    position: absolute;
+    inset-inline: 0;
+    height: 1.5px;
+    border-radius: 1px;
+    background-color: currentColor;
+    transition:
+      top 300ms cubic-bezier(0.65, 0, 0.35, 1),
+      transform 300ms cubic-bezier(0.65, 0, 0.35, 1);
+  }
+
+  .menu-icon > span:first-child {
+    top: 0;
+  }
+
+  .menu-icon > span:last-child {
+    top: calc(100% - 1.5px);
+  }
+
+  [aria-expanded="true"] > .menu-icon > span {
+    top: calc(50% - 0.75px);
+  }
+
+  [aria-expanded="true"] > .menu-icon > span:first-child {
+    transform: rotate(45deg);
+  }
+
+  [aria-expanded="true"] > .menu-icon > span:last-child {
+    transform: rotate(-45deg);
+  }
+
+  /* Panneau du menu mobile. Sans JS : liste statique sous l'en-tête. Avec JS :
+     panneau en surimpression qui se déplie (hauteur 0fr → 1fr) et dont les
+     liens arrivent en cascade ; masqué (visibility) quand il est fermé pour
+     ne pas être atteignable au clavier. */
+  .js .mobile-menu {
+    position: absolute;
+    inset-inline: 0;
+    top: 100%;
+    display: grid;
+    grid-template-rows: 0fr;
+    visibility: hidden;
+    background-color: color-mix(in oklab, var(--color-ink) 94%, transparent);
+    backdrop-filter: blur(12px);
+    transition:
+      grid-template-rows 450ms cubic-bezier(0.16, 1, 0.3, 1),
+      visibility 0s linear 450ms;
+  }
+
+  .js .mobile-menu[data-open="true"] {
+    grid-template-rows: 1fr;
+    visibility: visible;
+    border-bottom: 1px solid rgb(255 255 255 / 0.1);
+    transition:
+      grid-template-rows 450ms cubic-bezier(0.16, 1, 0.3, 1),
+      visibility 0s;
+  }
+
+  .mobile-menu__inner {
+    min-height: 0;
+    overflow: hidden;
+  }
+
+  .js .mobile-menu li {
+    opacity: 0;
+    transform: translateY(-0.5rem);
+    transition:
+      opacity 250ms ease,
+      transform 250ms ease;
+  }
+
+  .js .mobile-menu[data-open="true"] li {
+    opacity: 1;
+    transform: none;
+    transition:
+      opacity 400ms ease calc(80ms + var(--i, 0) * 50ms),
+      transform 500ms cubic-bezier(0.16, 1, 0.3, 1) calc(80ms + var(--i, 0) * 50ms);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .nav-link::after,
+    .menu-icon > span,
+    .js .mobile-menu,
+    .js .mobile-menu[data-open="true"],
+    .js .mobile-menu li,
+    .js .mobile-menu[data-open="true"] li {
+      transition: none;
+    }
+  }
+}

@@ -25,7 +25,7 @@ npm run preview   # sert le build de production
 - [x] Formulaire de contact câblé sur Formspree (voir "Formulaire de contact" ci-dessous)
 - [x] CMS Decap configuré (voir "Édition de contenu" ci-dessous)
 - [x] SEO/perf : sitemap, robots.txt, meta canonical/OG/Twitter, image OG par défaut,
-      polices auto-hébergées, images optimisées via `astro:assets` (Lighthouse ~97-100 sur
+      polices auto-hébergées, images optimisées via `astro:assets` (Lighthouse ~94-100 sur
       toutes les pages testées, cf. "SEO & performance" ci-dessous)
 - [x] Photos définitives choisies avec Gilles pour le hero, le portrait et l'image OG
 - [x] Hébergeur choisi (Netlify) et site déployé — https://gilles-gambini.netlify.app
@@ -33,6 +33,11 @@ npm run preview   # sert le build de production
       plongée scientifique) et section interviews sur l'accueil, pour retrouver la richesse
       visuelle de la version Streamlit
 - [x] Lien du CTA "Banque d'images" corrigé (pointait vers /contact au lieu de Pond5)
+- [x] Motion design GSAP piloté par attributs `data-*` (`src/scripts/motion.ts`) : entrée et
+      parallaxe du hero (ScrollTrigger), apparition des blocs au défilement, inclinaison 3D des
+      cartes et boutons "magnétiques" à la souris, soulignement animé de la navigation ;
+      `prefers-reduced-motion` respecté, contenu lisible sans JavaScript. Menu mobile
+      accessible et liens Facebook/Instagram/LinkedIn dans le hero, sur Contact et en pied de page
 
 ## SEO & performance
 
@@ -53,9 +58,9 @@ npm run preview   # sert le build de production
 - **`site` dans `astro.config.mjs` est un placeholder (`gilles-gambini.example`)** — à
   remplacer par le vrai nom de domaine dès qu'il est choisi (utilisé par le sitemap, les URLs
   canoniques et les balises Open Graph).
-- Audits Lighthouse (build de prod, en local) : Accueil 97/100/100/100, Services 100/100/100/100,
-  détail de stage 99/100/100/100, Contact 99/100/100/100 (Performance/Accessibilité/Bonnes
-  pratiques/SEO).
+- Audits Lighthouse (build de prod, en local, mobile), avec le motion design : Accueil
+  99/100/100/100, Services 100/100/100/100, Mentoring 95-97/100/100/100, détail de stage
+  94/100/100/100, Contact 100/100/100/100 (Performance/Accessibilité/Bonnes pratiques/SEO).
 
 ## Formulaire de contact
 
