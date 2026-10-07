@@ -85,6 +85,40 @@ que Gilles puisse éditer services, stages, tarifs et textes sans toucher au cod
 - Test en local : `npm run cms` (lance `decap-server`) puis ouvrir `/admin` en même temps que
   `npm run dev`.
 
+## Fonctionnalités en réserve
+
+Fonctionnalités entièrement codées mais **désactivées par défaut**, pour pouvoir les montrer
+rapidement à Gilles sans qu'elles apparaissent sur le site de production.
+
+### Globe interactif des expéditions
+
+Globe 3D en points (WebGL, librairie [cobe](https://github.com/shuding/cobe), ~6 Ko gzip chargés
+seulement quand la section arrive à l'écran) avec les lieux d'expédition et de stage ; une liste
+accessible à côté du globe fait tourner celui-ci vers le lieu choisi et affiche sa fiche.
+Fichiers : `src/components/ExpeditionsGlobe.astro` (+ `.css`), `src/scripts/globe.ts`,
+`src/data/expeditions.ts`, page de démo `src/pages/labo/[demo].astro`.
+
+- **Flag** : `PUBLIC_ENABLE_GLOBE` (voir `.env.example`). Sans `PUBLIC_ENABLE_GLOBE=true`, le
+  build ne contient ni la page `/labo/globe/`, ni le JavaScript/CSS du globe, ni d'entrée dans le
+  sitemap (`/labo/` en est de toute façon exclu, et la page de démo est en `noindex`).
+- **Démo en local** : `PUBLIC_ENABLE_GLOBE=true npm run dev` puis ouvrir
+  http://localhost:4321/labo/globe
+- **Démo en ligne pour le client** : sur Netlify, Site configuration → Environment variables,
+  ajouter `PUBLIC_ENABLE_GLOBE` = `true` **uniquement pour les contextes « Deploy Previews » et/ou
+  « Branch deploys »** (jamais « Production »), puis partager l'URL de la preview + `/labo/globe/`.
+- **Intégration future dans « Qui suis-je »** : afficher le composant dans
+  `src/pages/qui-suis-je.astro` derrière le flag, en une ligne :
+  `{import.meta.env.PUBLIC_ENABLE_GLOBE === 'true' && <ExpeditionsGlobe />}`.
+  Attention : un `import` statique du composant suffit à embarquer son script et son CSS dans le
+  build même flag désactivé ; tant que le flag existe, l'importer comme dans la page de démo
+  (`const ExpeditionsGlobe = import.meta.env.PUBLIC_ENABLE_GLOBE === 'true' ? (await
+  import('../components/ExpeditionsGlobe.astro')).default : null;`). Une fois validé, retirer la
+  condition, le flag et la page `/labo`.
+- **Données à compléter avec Gilles** : `src/data/expeditions.ts` ne contient pour l'instant que
+  les lieux déjà cités sur le site (Groenland, Nice/Méditerranée, Caraïbes, stages sous glace),
+  avec des coordonnées approximatives, des périodes `[À compléter]` et un badge « à confirmer ».
+  À remplacer par les vrais lieux, dates et missions (dont les missions ESA).
+
 ## Déploiement
 
 Le repo contient à la fois l'ancienne app Streamlit (racine) et ce site (`web/`) : dans les deux

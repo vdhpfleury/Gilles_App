@@ -6,12 +6,15 @@ interface Props {
   title: string;
   description?: string;
   image?: string;
+  /** Exclut la page des moteurs de recherche (pages de démonstration non publiques). */
+  noindex?: boolean;
 }
 
 const {
   title,
   description = "Apnéiste professionnel, biologiste marin et plongeur scientifique.",
   image = '/og-default.jpg',
+  noindex = false,
 } = Astro.props;
 
 const pageTitle = `${title} · Gilles Gambini`;
@@ -44,6 +47,7 @@ const isActive = (href: string) =>
     <script is:inline>document.documentElement.classList.add('js');</script>
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="description" content={description} />
+    {noindex && <meta name="robots" content="noindex, nofollow" />}
     <link rel="canonical" href={canonicalURL} />
     <title>{pageTitle}</title>
 
