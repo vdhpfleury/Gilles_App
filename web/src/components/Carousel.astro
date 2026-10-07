@@ -28,12 +28,17 @@ const css = `
 }`;
 ---
 
-<div class="relative overflow-hidden rounded-lg bg-ink" style={`height: ${height};`}>
+{/* Survol : liseré/halo lagon sur le cadre + léger zoom lent des photos (propriété
+    `scale`, indépendante de l'animation d'opacité du fondu enchaîné). */}
+<div
+  class="group relative overflow-hidden rounded-lg bg-ink ring-1 ring-white/10 transition-[box-shadow] duration-500 hover:shadow-[0_30px_80px_-40px_rgb(79_138_141/0.6)] hover:ring-lagon/50"
+  style={`height: ${height};`}
+>
   {images.map((img, i) => (
     <Image
       src={img.src}
       alt={img.alt}
-      class="absolute inset-0 h-full w-full object-cover opacity-0"
+      class="absolute inset-0 h-full w-full object-cover opacity-0 transition-[scale] duration-[1200ms] ease-out motion-safe:group-hover:scale-[1.04]"
       style={`animation: ${keyframeName} ${total}s infinite; animation-delay: ${i * duration}s;`}
       loading={i === 0 ? 'eager' : 'lazy'}
       widths={[480, 800, 1200]}

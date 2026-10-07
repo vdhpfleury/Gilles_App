@@ -3,6 +3,7 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 import Icon from '../components/Icon.astro';
 import Carousel from '../components/Carousel.astro';
 import YoutubeEmbed from '../components/YoutubeEmbed.astro';
+import SocialLinks from '../components/SocialLinks.astro';
 import { Image } from 'astro:assets';
 import { getCollection } from 'astro:content';
 import type { ImageMetadata } from 'astro';
@@ -22,49 +23,55 @@ const interviews = [
 ---
 
 <BaseLayout title="Accueil">
-  <section class="relative overflow-hidden">
+  <section data-hero class="relative overflow-hidden">
+    {/* Légèrement agrandie (scale) pour que le parallaxe ne découvre jamais un bord. */}
     <Image
       src={heroImage}
       alt="Gilles Gambini en apnée, émergeant sous une vague"
-      class="absolute inset-0 h-full w-full object-cover"
+      data-parallax
+      class="absolute inset-0 h-full w-full scale-[1.1] object-cover"
       widths={[640, 1024, 1600, 2000]}
       sizes="100vw"
       quality={80}
       loading="eager"
       fetchpriority="high"
     />
-    <div class="absolute inset-0 bg-gradient-to-b from-ink/40 to-ink/95"></div>
+    <div class="absolute inset-0 bg-gradient-to-b from-ink/55 to-ink/95"></div>
     <div class="relative mx-auto flex min-h-[70vh] max-w-6xl flex-col justify-end gap-6 px-6 py-20">
-      <p class="text-sm font-semibold tracking-widest text-lagon uppercase">
+      <p data-hero-item class="text-sm font-semibold tracking-widest text-lagon uppercase [text-shadow:0_1px_10px_rgb(0_0_0/0.85)]">
         Apnéiste professionnel · Biologiste marin
       </p>
-      <h1 class="font-display max-w-2xl text-5xl font-semibold text-ivory md:text-6xl">
+      <h1 data-hero-item class="font-display max-w-2xl text-5xl font-semibold text-ivory md:text-6xl">
         Gilles Gambini
       </h1>
-      <p class="max-w-xl text-base leading-relaxed text-muted-1">
+      <p data-hero-item class="max-w-xl text-base leading-relaxed text-muted-1">
         Instructeur, plongeur scientifique, scaphandrier et photographe. Un accompagnement entre
         science, exploration et performance pour repousser vos limites en milieu marin.
       </p>
-      <div>
+      <div data-hero-item class="flex flex-wrap items-center gap-x-4 gap-y-4 sm:gap-x-6">
         <a
           href="/contact"
-          class="inline-block rounded-sm bg-lagon px-7 py-3 text-xs font-semibold tracking-widest text-ink uppercase hover:opacity-90"
+          data-magnetic
+          class="inline-block rounded-sm bg-lagon px-6 py-3 text-xs font-semibold tracking-widest text-ink uppercase transition-colors hover:bg-ivory sm:px-7"
         >
           Me contacter
         </a>
+        <SocialLinks />
       </div>
     </div>
   </section>
 
   <section class="mx-auto max-w-6xl px-6 py-20">
-    <h2 class="font-display mb-10 text-3xl font-semibold text-ivory">Mes services</h2>
+    <h2 data-reveal class="font-display mb-10 text-3xl font-semibold text-ivory">Mes services</h2>
     <div class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
       {services.map((service) => (
         <a
           href={`/services/${service.id}`}
-          class="group flex flex-col gap-4 rounded-lg border border-white/15 bg-white/[0.03] p-6 transition hover:border-lagon"
+          data-reveal
+          data-tilt
+          class="group flex flex-col gap-4 rounded-lg border border-white/15 bg-white/[0.03] p-6 transition-[border-color,box-shadow] duration-300 hover:border-lagon hover:shadow-[0_24px_60px_-28px_rgb(79_138_141/0.55)]"
         >
-          <span class="flex h-12 w-12 items-center justify-center rounded-full border border-white/15 bg-white/[0.04] text-lagon">
+          <span class="flex h-12 w-12 items-center justify-center rounded-full border border-white/15 bg-white/[0.04] text-lagon transition-colors duration-300 group-hover:border-lagon/60 group-hover:bg-lagon/10">
             <Icon name={service.data.icon} />
           </span>
           <h3 class="font-display text-lg font-semibold text-ivory">{service.data.title}</h3>
@@ -75,22 +82,24 @@ const interviews = [
   </section>
 
   <section class="mx-auto max-w-6xl px-6 pb-20">
-    <blockquote class="border-l-4 border-lagon bg-white/[0.03] p-8 font-display text-xl italic text-ivory">
+    <blockquote data-reveal class="border-l-4 border-lagon bg-white/[0.03] p-8 font-display text-xl italic text-ivory">
       « Chaque stage est une expérience humaine et sensorielle. On apprend à mieux respirer, à
       mieux comprendre… et à mieux vivre. »
     </blockquote>
   </section>
 
   <section class="mx-auto max-w-6xl px-6 pb-20">
-    <h2 class="font-display mb-10 text-3xl font-semibold text-ivory">En images</h2>
-    <Carousel id="accueil" images={galleryImages} height="480px" duration={3.5} />
+    <h2 data-reveal class="font-display mb-10 text-3xl font-semibold text-ivory">En images</h2>
+    <div data-reveal>
+      <Carousel id="accueil" images={galleryImages} height="480px" duration={3.5} />
+    </div>
   </section>
 
   <section class="mx-auto max-w-6xl px-6 pb-20">
-    <h2 class="font-display mb-10 text-3xl font-semibold text-ivory">Quelques interviews</h2>
+    <h2 data-reveal class="font-display mb-10 text-3xl font-semibold text-ivory">Quelques interviews</h2>
     <div class="grid gap-8 sm:grid-cols-3">
       {interviews.map((video) => (
-        <div class="flex flex-col gap-3">
+        <div data-reveal class="flex flex-col gap-3">
           <YoutubeEmbed videoId={video.videoId} title={video.title} />
           <p class="text-center text-sm italic text-muted-1">{video.caption}</p>
         </div>

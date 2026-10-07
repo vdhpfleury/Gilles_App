@@ -7,8 +7,8 @@ const stages = (await getCollection('stages')).sort((a, b) => a.data.order - b.d
 
 <BaseLayout title="Stages" description="Stages d'apnée sous glace, débutant, avancé et de plongée scientifique avec Gilles Gambini.">
   <section class="mx-auto max-w-6xl px-6 py-16">
-    <h1 class="font-display mb-4 text-4xl font-semibold text-ivory">Stages</h1>
-    <p class="mb-10 max-w-2xl text-muted-1">
+    <h1 data-reveal class="font-display mb-4 text-4xl font-semibold text-ivory">Stages</h1>
+    <p data-reveal class="mb-10 max-w-2xl text-muted-1">
       Depuis plus de 10 ans, ces stages sont une immersion complète entre science, exploration et
       performance — pour se reconnecter à l'océan, apprendre à mieux respirer et repousser ses
       limites.
@@ -17,7 +17,9 @@ const stages = (await getCollection('stages')).sort((a, b) => a.data.order - b.d
       {stages.map((stage) => (
         <a
           href={`/stages/${stage.id}`}
-          class="group flex flex-col gap-3 rounded-lg border border-white/15 bg-white/[0.03] p-6 transition hover:border-lagon"
+          data-reveal
+          data-tilt
+          class="group flex flex-col gap-3 rounded-lg border border-white/15 bg-white/[0.03] p-6 transition-[border-color,box-shadow] duration-300 hover:border-lagon hover:shadow-[0_24px_60px_-28px_rgb(79_138_141/0.55)]"
         >
           <p class="text-xs font-semibold tracking-widest text-lagon uppercase">{stage.data.niveau}</p>
           <h2 class="font-display text-xl font-semibold text-ivory">{stage.data.title}</h2>

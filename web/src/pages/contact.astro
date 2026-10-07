@@ -1,5 +1,6 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
+import SocialLinks from '../components/SocialLinks.astro';
 
 const formspreeId = import.meta.env.PUBLIC_FORMSPREE_ID as string | undefined;
 const isConfigured = Boolean(formspreeId);
@@ -8,14 +9,14 @@ const isConfigured = Boolean(formspreeId);
 <BaseLayout title="Contact" description="Contactez Gilles Gambini pour une demande de mentoring, coaching, conférence, stage ou intervention hyperbare.">
   <section class="mx-auto grid max-w-6xl gap-12 px-6 py-16 md:grid-cols-[2fr_1fr]">
     <div>
-      <h1 class="font-display mb-2 text-4xl font-semibold text-ivory">Contact</h1>
-      <p class="mb-8 text-muted-1">
+      <h1 data-reveal class="font-display mb-2 text-4xl font-semibold text-ivory">Contact</h1>
+      <p data-reveal class="mb-8 text-muted-1">
         Pour toute demande d'information, réservation ou projet personnalisé, n'hésitez pas à me
         contacter. Je réponds généralement sous 48h.
       </p>
 
       {!isConfigured && (
-        <p class="mb-6 rounded-md border border-lagon/40 bg-lagon/10 p-3 text-xs text-ivory">
+        <p data-reveal class="mb-6 rounded-md border border-lagon/40 bg-lagon/10 p-3 text-xs text-ivory">
           Formulaire en attente de configuration (<code>PUBLIC_FORMSPREE_ID</code>) — écrivez-moi
           directement à <a href="mailto:gilles.gambini@hotmail.fr" class="underline">gilles.gambini@hotmail.fr</a>.
         </p>
@@ -23,6 +24,7 @@ const isConfigured = Boolean(formspreeId);
 
       <form
         id="contact-form"
+        data-reveal
         class="flex flex-col gap-5"
         method="POST"
         action={isConfigured ? `https://formspree.io/f/${formspreeId}` : undefined}
@@ -99,7 +101,8 @@ const isConfigured = Boolean(formspreeId);
         <button
           type="submit"
           disabled={!isConfigured}
-          class="self-start rounded-sm bg-lagon px-7 py-3 text-xs font-semibold tracking-widest text-ink uppercase hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-40"
+          data-magnetic
+          class="self-start rounded-sm bg-lagon px-7 py-3 text-xs font-semibold tracking-widest text-ink uppercase transition-colors enabled:hover:bg-ivory disabled:cursor-not-allowed disabled:opacity-40"
         >
           Envoyer
         </button>
@@ -108,7 +111,7 @@ const isConfigured = Boolean(formspreeId);
     </div>
 
     <div class="flex flex-col gap-6">
-      <div>
+      <div data-reveal>
         <h2 class="font-display mb-3 text-lg font-semibold text-ivory">Coordonnées</h2>
         <p class="text-sm text-muted-1">
           <strong class="text-ivory">Email :</strong><br />gilles.gambini@hotmail.fr
@@ -120,13 +123,9 @@ const isConfigured = Boolean(formspreeId);
           <strong class="text-ivory">Disponibilité :</strong><br />Interventions en France et à l'international
         </p>
       </div>
-      <div>
+      <div data-reveal>
         <h2 class="font-display mb-3 text-lg font-semibold text-ivory">Suivez-moi</h2>
-        <div class="flex flex-col gap-2 text-sm">
-          <a href="https://www.facebook.com/share/1BhzPeJTXS/" target="_blank" rel="noopener" class="text-muted-1 hover:text-lagon">Facebook</a>
-          <a href="https://www.linkedin.com/in/gilles-gambini-5298a287/" target="_blank" rel="noopener" class="text-muted-1 hover:text-lagon">LinkedIn</a>
-          <a href="https://www.instagram.com/gillesgambini/" target="_blank" rel="noopener" class="text-muted-1 hover:text-lagon">Instagram</a>
-        </div>
+        <SocialLinks />
       </div>
     </div>
   </section>
