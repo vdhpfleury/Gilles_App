@@ -97,13 +97,16 @@ body {
   }
 }
 
-/* Plus haut que l'écran de --fade : son bord haut, en fondu depuis l'encre, suit le bas du
-   hero (translateY écrit par descent.ts) puis sort par le haut une fois sous la surface. */
+/* Plus haut que l'écran de --fade (hauteur du fondu, définie une seule fois : FADE dans
+   descent.ts, qui pose la variable). Son bord haut, en fondu depuis l'encre, suit le bas du
+   hero (translateY écrit par descent.ts) puis sort par le haut une fois sous la surface. Le
+   fondu ne part pas de 0 mais de 5 % : le bas du hero (encre à 95 % sur la photo) est un
+   rien plus clair que l'encre seule, ce qui laissait une fine bande sombre à la jonction. */
 .descent__layer {
   position: absolute;
   inset: 0 0 auto;
-  height: calc(100% + var(--fade, 240px));
-  mask-image: linear-gradient(to bottom, transparent, #000 var(--fade, 240px));
+  height: calc(100% + var(--fade));
+  mask-image: linear-gradient(to bottom, rgb(0 0 0 / 0.05), #000 var(--fade));
   will-change: transform;
 }
 
@@ -124,7 +127,7 @@ body {
 /* Lueur venue de la surface, qui s'éteint dans les premiers mètres (opacité écrite par
    descent.ts). */
 .descent__glow {
-  background: radial-gradient(130% 55% at 50% var(--fade, 240px), rgb(79 138 141 / 0.06), transparent 75%);
+  background: radial-gradient(130% 55% at 50% var(--fade), rgb(79 138 141 / 0.06), transparent 75%);
 }
 
 /* Bulles : au repos et masquées tant que le hero occupe l'écran (rien ne bouge sous le
@@ -142,21 +145,33 @@ body {
 }
 
 /* Une seule animation (transform, composité) par bulle : la montée et un léger balancement
-   latéral. La densité baisse avec la profondeur : descent.ts marque [data-gone] une part
-   croissante des bulles, qui s'effacent en fondu ; plus aucune vers 85 % de la descente. */
+   latéral. Chaque bulle est une colonne pleine hauteur du calque, la bulle dessinée juste
+   sous son bas : translateY(-100 %) lui fait donc parcourir exactement le calque, quelle que
+   soit --fade, sans var() dans les keyframes (qui obligerait Chrome à recalculer le style
+   des bulles à chaque image). La densité baisse avec la profondeur : descent.ts marque
+   [data-gone] une part croissante des bulles, qui s'effacent en fondu ; plus aucune vers
+   85 % de la descente. */
 .descent__bubble {
   position: absolute;
-  bottom: -0.75rem;
+  inset-block: 0;
   width: var(--size);
-  height: var(--size);
-  border: 1px solid rgb(244 241 234 / 0.5);
-  border-radius: 50%;
-  background: radial-gradient(circle at 32% 30%, rgb(255 255 255 / 0.55), rgb(255 255 255 / 0.06) 55%, transparent 72%);
   opacity: 0.55;
   transition: opacity 1.2s ease;
   animation: descent-rise var(--rise) linear var(--delay) infinite;
   animation-play-state: paused;
   will-change: transform;
+}
+
+.descent__bubble::before {
+  content: "";
+  position: absolute;
+  top: 100%;
+  left: 0;
+  width: var(--size);
+  height: var(--size);
+  border: 1px solid rgb(244 241 234 / 0.5);
+  border-radius: 50%;
+  background: radial-gradient(circle at 32% 30%, rgb(255 255 255 / 0.55), rgb(255 255 255 / 0.06) 55%, transparent 72%);
 }
 
 .descent__bubble[data-gone] {
@@ -167,21 +182,19 @@ body {
   animation-play-state: running;
 }
 
-/* Course : toute la hauteur du calque (100lvh + --fade, soit 240 px = 15rem) plus la taille
-   d'une bulle. Valeurs constantes : une var() dans les keyframes oblige Chrome à recalculer
-   le style des bulles à chaque image. */
+/* Course : la hauteur de la colonne (= celle du calque) plus la taille maximale d'une bulle. */
 @keyframes descent-rise {
   25% {
-    transform: translate3d(0.375rem, calc((-100lvh - 16.5rem) * 0.25), 0);
+    transform: translate3d(0.375rem, calc(-25% - 0.1875rem), 0);
   }
   50% {
-    transform: translate3d(0, calc((-100lvh - 16.5rem) * 0.5), 0);
+    transform: translate3d(0, calc(-50% - 0.375rem), 0);
   }
   75% {
-    transform: translate3d(-0.375rem, calc((-100lvh - 16.5rem) * 0.75), 0);
+    transform: translate3d(-0.375rem, calc(-75% - 0.5625rem), 0);
   }
   to {
-    transform: translate3d(0, calc(-100lvh - 16.5rem), 0);
+    transform: translate3d(0, calc(-100% - 0.75rem), 0);
   }
 }
 
