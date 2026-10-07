@@ -7,7 +7,13 @@ import sitemap from '@astrojs/sitemap';
 // balises Open Graph. `.example` est un TLD réservé aux placeholders (RFC 2606).
 export default defineConfig({
   site: 'https://gilles-gambini.example',
-  integrations: [sitemap()],
+  integrations: [
+    sitemap({
+      // Filet de sécurité : les pages de démonstration (/labo/, fonctionnalités en réserve
+      // derrière un flag) ne doivent jamais être référencées.
+      filter: (page) => !new URL(page).pathname.startsWith('/labo/'),
+    }),
+  ],
   vite: {
     plugins: [tailwindcss()],
   },
