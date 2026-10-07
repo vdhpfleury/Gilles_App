@@ -7,7 +7,7 @@
 
 /* --- Section ------------------------------------------------------------------------ */
 .globe-section {
-  max-width: 72rem;
+  max-width: 64rem; /* = max-w-5xl : aligné sur la colonne de la page « Qui suis-je » */
   margin-inline: auto;
   padding: 4rem 1.5rem;
 }
@@ -272,7 +272,8 @@ html:not(.js) .globe-layout,
     box-shadow 250ms ease;
 }
 
-.globe-item:hover {
+.globe-item:hover,
+.globe-item:focus-visible {
   background: rgb(255 255 255 / 0.03);
 }
 

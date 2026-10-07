@@ -6,8 +6,9 @@ import type { Globe, Marker } from 'cobe';
  * - [data-globe-stage]       conteneur carré du globe (canvas + halos)
  * - [data-globe-canvas]      canvas WebGL rendu par cobe (aria-hidden : la liste porte l'info)
  * - [data-globe-halo]        halo HTML de chaque lieu, positionné au-dessus du marqueur
- * - [data-globe-item]        boutons de la liste (data-index, data-lat, data-lng)
- * - [data-globe-detail]      fiches détaillées (une par lieu, data-index)
+ * - [data-globe-item]        boutons de la liste (data-lat, data-lng)
+ * - [data-globe-detail]      fiches détaillées, une par lieu
+ * Boutons, halos et fiches sont associés par leur ordre dans le DOM (même ordre de rendu).
  * - [data-globe-placeholder] invitation affichée tant que rien n'est sélectionné
  *
  * La liste fonctionne seule (sans WebGL, ou avant le chargement du globe). Le globe n'est
@@ -153,9 +154,10 @@ export function initExpeditionsGlobe(root: HTMLElement) {
     requestFrame();
   }
 
+  // Sélection au clic, à Entrée ou Espace (le « click » natif d'un <button>), jamais au simple
+  // focus : parcourir la liste au clavier ne change pas la sélection.
   places.forEach((place, i) => {
     place.button.addEventListener('click', () => select(i));
-    place.button.addEventListener('focus', () => select(i));
   });
 
   // --- Globe (chargé à la demande) ---------------------------------------------------------
