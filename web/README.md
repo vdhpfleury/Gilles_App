@@ -39,6 +39,11 @@ npm run preview   # sert le build de production
       `prefers-reduced-motion` respecté, contenu lisible sans JavaScript. Menu mobile
       accessible et liens Facebook/Instagram/LinkedIn dans le hero, sur Contact et en pied de page
 - [x] « Photo en relief » WebGL (desktop, `src/scripts/hero3d.ts`) réutilisable via `data-depth-photo` + `data-depth-src` (option `data-depth-bubbles`, `data-depth-caustics`) : hero, bandeaux de « Qui suis-je » et du stage sous glace ; cartes de profondeur `public/3d/*-depth.webp` (blanc = proche) livrées déjà floutées (Gaussien σ = 12 px sur 1200 px de large) ; globe des expéditions affiché en fin de « Qui suis-je » si `PUBLIC_ENABLE_GLOBE=true`
+- [x] « La descente » sur l'accueil (`src/scripts/descent.ts`, `src/components/DepthGauge.astro`) :
+      sous le hero, l'eau passe du bleu de surface (#0c2f4a, contraste AA vérifié) à l'encre en
+      défilant, avec des bulles CSS qui se raréfient et une jauge de profondeur 0 → 100 m à droite
+      (≥ 1024 px, libellés ≥ 1440 px) ; décoratif, sans effet sans JS, bulles masquées en
+      `prefers-reduced-motion`
 
 ## SEO & performance
 

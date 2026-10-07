@@ -1,0 +1,239 @@
+---
+/*
+ * Jauge de profondeur décorative (« la descente », page d'accueil) : échelle 0 → 100 m,
+ * repère lagon et profondeur courante, pilotés par src/scripts/descent.ts. Masquée sans
+ * JavaScript et sous 1024 px ; variante fine (graduations seules) jusqu'à 1440 px, là où
+ * la marge à droite du contenu ne laisse pas la place aux libellés.
+ */
+interface Props {
+  /** Repères de section : `id` correspond à l'attribut data-depth-section d'une section. */
+  sections?: { id: string; label: string }[];
+}
+
+const { sections = [] } = Astro.props;
+
+// Graduations tous les 2 m, plus longues tous les 10 m (viewBox 12 × 100 : 1 unité = 1 m).
+const ticks = Array.from({ length: 51 }, (_, i) => i * 2)
+  .map((m) => `M${m % 10 === 0 ? 0 : 6} ${m}H12`)
+  .join('');
+---
+
+<div class="depth-gauge" aria-hidden="true" data-depth-gauge>
+  <p class="depth-gauge__cap depth-gauge__cap--top">Surface</p>
+  <div class="depth-gauge__scale">
+    <svg class="depth-gauge__ticks" viewBox="0 0 12 100" preserveAspectRatio="none" focusable="false">
+      <path d={ticks} />
+    </svg>
+    <ul class="depth-gauge__labels">
+      {sections.map((section) => (
+        <li class="depth-gauge__label" data-depth-label={section.id}>{section.label}</li>
+      ))}
+    </ul>
+    <div class="depth-gauge__track" data-depth-indicator>
+      <div class="depth-gauge__indicator">
+        <span class="depth-gauge__value" data-depth-value>0 m</span>
+      </div>
+    </div>
+  </div>
+  <p class="depth-gauge__cap depth-gauge__cap--bottom" data-depth-cap>100 m</p>
+</div>
+
+<style>
+  /* Sans JavaScript, ou sous 1024 px : rien. */
+  .depth-gauge {
+    display: none;
+  }
+
+  @media (width >= 64rem) {
+    :global(.descent-ready) .depth-gauge {
+      --gauge-h: min(52vh, 26rem);
+      position: fixed;
+      top: 50%;
+      right: 0.25rem;
+      z-index: 30;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 0.625rem;
+      translate: 0 -50%;
+      pointer-events: none;
+      user-select: none;
+      opacity: 0;
+      transition: opacity 600ms ease;
+    }
+
+    :global(.descent-ready) .depth-gauge.is-active {
+      opacity: 1;
+    }
+  }
+
+  /* Variante fine (1024–1440 px) : elle tient dans la marge intérieure de 24 px du contenu. */
+  .depth-gauge__scale {
+    position: relative;
+    width: 0.5rem;
+    height: var(--gauge-h);
+  }
+
+  .depth-gauge__ticks {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    overflow: visible;
+  }
+
+  .depth-gauge__ticks path {
+    fill: none;
+    stroke: rgb(244 241 234 / 0.28);
+    stroke-width: 1;
+    vector-effect: non-scaling-stroke;
+  }
+
+  /* Le repère glisse sur toute la hauteur : translateY(p × 100 %) de cette piste
+     pleine hauteur (transform seul, composité). */
+  .depth-gauge__track {
+    position: absolute;
+    inset: 0;
+    will-change: transform;
+  }
+
+  .depth-gauge__indicator {
+    position: absolute;
+    top: -1px;
+    right: -0.125rem;
+    width: 0.75rem;
+    height: 2px;
+    background-color: var(--color-lagon);
+    box-shadow: 0 0 10px rgb(79 138 141 / 0.7);
+  }
+
+  .depth-gauge__indicator::after {
+    content: "";
+    display: none;
+    position: absolute;
+    top: -1.5px;
+    left: -2px;
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background-color: var(--color-lagon);
+  }
+
+  /* Libellés, profondeur courante et bornes : seulement là où la marge à droite du contenu
+     (max-w-6xl) les accueille sans rien recouvrir. */
+  .depth-gauge__cap,
+  .depth-gauge__labels,
+  .depth-gauge__value {
+    display: none;
+  }
+
+  @media (width >= 90rem) {
+    :global(.descent-ready) .depth-gauge {
+      right: 1.75rem;
+    }
+
+    .depth-gauge__scale {
+      width: 0.75rem;
+    }
+
+    .depth-gauge__indicator {
+      right: -0.25rem;
+      width: 1.25rem;
+    }
+
+    .depth-gauge__cap,
+    .depth-gauge__labels,
+    .depth-gauge__value,
+    .depth-gauge__indicator::after {
+      display: block;
+    }
+  }
+
+  .depth-gauge__cap {
+    font-size: 0.625rem;
+    font-weight: 600;
+    letter-spacing: 0.16em;
+    line-height: 1;
+    text-transform: uppercase;
+    font-variant-numeric: tabular-nums;
+    color: var(--color-muted-2);
+  }
+
+  /* Borne basse effacée quand la profondeur courante arrive à sa hauteur. */
+  .depth-gauge__cap--bottom {
+    letter-spacing: 0.04em;
+    text-transform: none;
+    transition: opacity 300ms ease;
+  }
+
+  .depth-gauge__cap--bottom.is-near {
+    opacity: 0;
+  }
+
+  .depth-gauge__labels {
+    position: absolute;
+    inset: 0;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .depth-gauge__label {
+    position: absolute;
+    top: calc(var(--d, 0) * 100%);
+    right: calc(100% + 0.75rem);
+    font-size: 0.625rem;
+    font-weight: 600;
+    letter-spacing: 0.16em;
+    line-height: 1;
+    white-space: nowrap;
+    text-transform: uppercase;
+    color: var(--color-muted-2);
+    translate: 0 -50%;
+    transition:
+      opacity 300ms ease,
+      color 300ms ease;
+  }
+
+  /* Section atteinte : libellé éclairé. Repère tout proche : le libellé s'efface pour
+     laisser la place à la profondeur courante. */
+  .depth-gauge__label.is-passed {
+    color: var(--color-muted-1);
+  }
+
+  .depth-gauge__label.is-near {
+    opacity: 0;
+  }
+
+  .depth-gauge__value {
+    position: absolute;
+    top: 50%;
+    right: calc(100% + 0.5rem);
+    width: 3.5rem;
+    height: 1rem;
+    contain: strict;
+    font-size: 0.75rem;
+    font-weight: 500;
+    letter-spacing: 0.02em;
+    line-height: 1rem;
+    text-align: right;
+    white-space: nowrap;
+    font-variant-numeric: tabular-nums;
+    color: var(--color-ivory);
+    translate: 0 -50%;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    :global(.descent-ready) .depth-gauge,
+    .depth-gauge__label,
+    .depth-gauge__cap--bottom {
+      transition: none;
+    }
+  }
+
+  @media print {
+    :global(.descent-ready) .depth-gauge {
+      display: none;
+    }
+  }
+</style>
