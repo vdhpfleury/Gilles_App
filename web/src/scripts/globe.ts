@@ -11,9 +11,10 @@ import type { Globe, Marker } from 'cobe';
  * Boutons, halos et fiches sont associés par leur ordre dans le DOM (même ordre de rendu).
  * - [data-globe-placeholder] invitation affichée tant que rien n'est sélectionné
  *
+ * Ce module est lui-même chargé à la demande par motion.ts, à l'approche de la section.
  * La liste fonctionne seule (sans WebGL, ou avant le chargement du globe). Le globe n'est
- * chargé (import dynamique de cobe) qu'à l'approche de la section, ne tourne que lorsqu'elle
- * est à l'écran et l'onglet actif, et est détruit au pagehide.
+ * chargé (import dynamique de cobe) qu'à l'approche du globe, ne tourne que lorsqu'il est à
+ * l'écran et l'onglet actif, et est détruit au pagehide.
  */
 
 type RGB = [number, number, number];

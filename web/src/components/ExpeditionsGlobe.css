@@ -1,7 +1,7 @@
 /*
  * Globe des expéditions : styles du composant ExpeditionsGlobe.astro (charte "Abysse").
- * Fichier .css plutôt que classes utilitaires : Tailwind ne scanne pas les .css, donc tant que
- * le flag est désactivé, rien du globe n'arrive dans la feuille de styles du site.
+ * Fichier .css importé par le composant plutôt que classes utilitaires : ces styles ne sont
+ * chargés que sur la page qui affiche le globe (« Qui suis-je »), pas dans la feuille du site.
  * Les variables du thème ont une valeur de repli : Tailwind n'émet que celles utilisées ailleurs.
  */
 
@@ -10,11 +10,6 @@
   max-width: 64rem; /* = max-w-5xl : aligné sur la colonne de la page « Qui suis-je » */
   margin-inline: auto;
   padding: 4rem 1.5rem;
-}
-
-/* En-tête de la page de démonstration (/labo/globe/), juste au-dessus de la section. */
-.globe-section.globe-section--intro {
-  padding-bottom: 0;
 }
 
 .globe-intro {
@@ -87,14 +82,17 @@
   margin-inline: auto;
 }
 
-/* Sans JavaScript ou sans WebGL, pas de globe : la liste et les fiches suffisent. */
+/* Sans JavaScript ou sans WebGL, pas de globe : la liste et les fiches suffisent ('failed' :
+   le module du globe n'a pas pu être téléchargé, voir motion.ts). */
 html:not(.js) .globe-stage,
-[data-globe-state='unsupported'] .globe-stage {
+[data-globe-state='unsupported'] .globe-stage,
+[data-globe-state='failed'] .globe-stage {
   display: none;
 }
 
 html:not(.js) .globe-layout,
-[data-globe-state='unsupported'] .globe-layout {
+[data-globe-state='unsupported'] .globe-layout,
+[data-globe-state='failed'] .globe-layout {
   grid-template-columns: minmax(0, 42rem);
 }
 
@@ -347,13 +345,6 @@ html:not(.js) .globe-layout,
   background: linear-gradient(160deg, rgb(79 138 141 / 0.08), rgb(255 255 255 / 0.02) 55%);
 }
 
-.globe-detail__head {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 0.5rem 0.75rem;
-}
-
 .globe-detail__titre {
   margin-top: 0.5rem;
   color: var(--color-ivory, #f4f1ea);
@@ -386,18 +377,9 @@ html:not(.js) .globe-layout,
   line-height: 1.625;
 }
 
-.globe-badge {
-  padding: 0 0.55rem;
-  border: 1px dashed rgb(185 194 200 / 0.45);
-  border-radius: 999px;
-  color: var(--color-muted-1, #b9c2c8);
-  font-size: 0.6875rem;
-  letter-spacing: 0.04em;
-  line-height: 1.25rem;
-}
-
-/* Sans JavaScript, toutes les fiches se lisent à la suite ; avec JavaScript, seule celle du
-   lieu sélectionné est affichée (avec une invitation tant que rien n'est choisi). */
+/* Sans JavaScript (ou module du globe injoignable), toutes les fiches se lisent à la suite ;
+   avec JavaScript, seule celle du lieu sélectionné est affichée (avec une invitation tant que
+   rien n'est choisi). */
 .globe-placeholder {
   display: none;
   color: var(--color-muted-2, #8b939a);
@@ -410,21 +392,21 @@ html:not(.js) .globe-layout,
   border-top: 1px solid rgb(255 255 255 / 0.08);
 }
 
-.js .globe-placeholder:not([hidden]) {
+.js [data-globe]:not([data-globe-state='failed']) .globe-placeholder:not([hidden]) {
   display: block;
 }
 
-.js .globe-detail__item {
+.js [data-globe]:not([data-globe-state='failed']) .globe-detail__item {
   margin: 0;
   padding: 0;
   border: 0;
 }
 
-.js .globe-detail__item:not([data-active]) {
+.js [data-globe]:not([data-globe-state='failed']) .globe-detail__item:not([data-active]) {
   display: none;
 }
 
-.js .globe-detail__item[data-active] {
+.js [data-globe]:not([data-globe-state='failed']) .globe-detail__item[data-active] {
   animation: globe-fade 450ms ease both;
 }
 
@@ -448,7 +430,7 @@ html:not(.js) .globe-layout,
   }
 
   .globe-halo[data-active]::after,
-  .js .globe-detail__item[data-active] {
+  .js [data-globe]:not([data-globe-state='failed']) .globe-detail__item[data-active] {
     animation: none;
   }
 }

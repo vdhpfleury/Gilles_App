@@ -1,9 +1,11 @@
 ---
 /*
- * Globe interactif des expéditions (WebGL via cobe, chargé à la demande).
- * Fonctionnalité en réserve : à n'afficher que derrière PUBLIC_ENABLE_GLOBE (voir README).
+ * Globe interactif des expéditions (WebGL via cobe), affiché en fin de page « Qui suis-je ».
+ * Lieux et fiches : src/data/expeditions.ts. Pas de <script> ici : motion.ts (chargé par
+ * BaseLayout) repère [data-globe] et ne télécharge src/scripts/globe.ts, puis cobe, qu'à
+ * l'approche de la section.
  * La liste de boutons porte toute l'information ; le globe n'est qu'une illustration
- * (canvas aria-hidden) et la liste reste utilisable sans WebGL ni JavaScript.
+ * (canvas aria-hidden) et la liste reste lisible sans WebGL ni JavaScript.
  */
 import { expeditions, typeLabels } from '../data/expeditions';
 import './ExpeditionsGlobe.css';
@@ -70,16 +72,17 @@ const titleId = `${id}-titre`;
         </p>
         {expeditions.map((e, i) => (
           <article id={`${id}-detail-${i}`} class="globe-detail__item" data-globe-detail>
-            <div class="globe-detail__head">
-              <p class="globe-eyebrow">{typeLabels[e.type]}</p>
-              {e.aConfirmer && <span class="globe-badge">à confirmer</span>}
-            </div>
+            <p class="globe-eyebrow">{typeLabels[e.type]}</p>
             <h3 class="globe-detail__titre">{e.titre}</h3>
             <dl class="globe-detail__facts">
               <dt>Lieu</dt>
               <dd>{e.lieu} · {e.region}</dd>
-              <dt>Période</dt>
-              <dd>{e.periode}</dd>
+              {e.periode && (
+                <>
+                  <dt>Période</dt>
+                  <dd>{e.periode}</dd>
+                </>
+              )}
             </dl>
             <p class="globe-detail__desc">{e.description}</p>
           </article>
@@ -88,9 +91,3 @@ const titleId = `${id}-titre`;
     </div>
   </div>
 </section>
-
-<script>
-  import { initExpeditionsGlobe } from '../scripts/globe';
-
-  document.querySelectorAll<HTMLElement>('[data-globe]').forEach(initExpeditionsGlobe);
-</script>
