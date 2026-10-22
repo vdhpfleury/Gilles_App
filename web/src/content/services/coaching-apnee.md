@@ -9,7 +9,7 @@ formules:
       1 appel de suivi (30 min à 1h), un bloc d'exercices mensuel (préparation
       à sec, relaxation, renforcement, apnée, visualisation), un plan de
       progression ajusté et un échange direct entre les sessions.
-    prix: "100 € / mois, sans engagement"
+    prix: "200 € / mois, sans engagement"
     cta: "Réserver mon appel découverte"
 ---
 

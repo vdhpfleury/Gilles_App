@@ -24,19 +24,24 @@ const ExpeditionsGlobe =
     <div class="flex flex-col gap-10 md:flex-row md:items-start">
       <Image
         src={portrait}
-        alt="Portrait de Gilles Gambini"
+        alt="Gilles Gambini en combinaison d'apnée, au bord de l'eau devant une falaise calcaire"
         data-reveal
         class="w-full max-w-xs rounded-lg object-cover md:w-64"
         width={320}
         height={400}
+        densities={[1, 2]}
         quality={80}
       />
       <div data-reveal>
         <h1 class="font-display text-4xl font-semibold text-ivory">Gilles Gambini</h1>
         <p class="mt-2 text-sm font-semibold tracking-widest text-lagon uppercase">
-          Apnéiste professionnel • Biologiste marin • Plongeur scientifique • Photographe
+          Apnéiste professionnel • Biologiste marin • Plongeur scientifique • Scaphandrier •
+          Instructeur • Vidéaste
         </p>
         <p class="mt-2 text-sm text-muted-2">DEJEPS • Plongeur 2A, 3B • Recycleur hypoxique</p>
+        <p class="mt-5 inline-block rounded-full border border-lagon/50 bg-lagon/10 px-4 py-1.5 text-xs font-semibold tracking-widest text-ivory uppercase">
+          Ambassadeur officiel Ball Watch
+        </p>
       </div>
     </div>
 
