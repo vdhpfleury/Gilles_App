@@ -1,0 +1,76 @@
+---
+/*
+ * Bande « Partenaires » en bas du hero (accueil), sous le contact et les réseaux sociaux :
+ * logos ivoire posés sur la photo assombrie, sans cartouche, atténués au repos et à pleine
+ * opacité au survol ou au focus, dans quatre cellules identiques sur une rangée. Entre avec le
+ * reste du hero (data-hero-item). Liste, liens et réglages : src/data/sponsors.ts.
+ */
+import { Image } from 'astro:assets';
+import { sponsors } from '../data/sponsors';
+
+// Côté (px) d'un logo carré à partir de md (--logo-unit, 3.5rem) ; en dessous, 2.25rem pour tenir
+// à quatre sur une rangée dès 375 px. Donne les attributs width/height (aucun décalage de mise
+// en page) et les largeurs des images générées.
+const UNIT = 56;
+const UNIT_MOBILE = 36;
+
+// Taille optique commune : même aire pour tous les logos (largeur ∝ √ratio, hauteur ∝ 1/√ratio),
+// corrigée par `echelle`. À partir de md, la hauteur CSS (--logo-unit × --logo-h) tombe
+// exactement sur l'attribut height : l'image 1x s'affiche pixel pour pixel. Images générées : 1x
+// et 2x des largeurs mobile et desktop (la 2x desktop sert aux écrans 3x en mobile) ; `sizes`
+// laisse le navigateur prendre la plus petite qui suffit.
+const logos = sponsors.map((sponsor) => {
+  const ratio = sponsor.logo.width / sponsor.logo.height;
+  const width = Math.round(UNIT * (sponsor.echelle ?? 1) * Math.sqrt(ratio));
+  const height = Math.round(width / ratio);
+  const mobileWidth = Math.round((width * UNIT_MOBILE) / UNIT);
+  return {
+    ...sponsor,
+    width,
+    height,
+    h: height / UNIT,
+    widths: [mobileWidth, width, 2 * mobileWidth, 2 * width],
+    sizes: `(min-width: 48rem) ${width}px, ${mobileWidth}px`,
+  };
+});
+---
+
+<div
+  data-hero-item
+  class="flex flex-col gap-2 border-t border-white/10 pt-4 [--logo-unit:2.25rem] md:mt-4 md:flex-row md:items-center md:gap-10 md:pt-6 md:[--logo-unit:3.5rem]"
+>
+  {/* Libellé en muted-1 et non en lagon : en bas du hero, le lagon descend sous 4,5:1. */}
+  <p id="partenaires" class="text-xs font-semibold tracking-widest text-muted-1 uppercase">Partenaires</p>
+  <ul aria-labelledby="partenaires" class="grid flex-1 grid-cols-4">
+    {logos.map(({ url, ...sponsor }) => {
+      const Wrapper = url ? 'a' : 'div';
+      const link = url ? { href: url, target: '_blank', rel: 'noopener noreferrer' } : {};
+      return (
+        <li class="flex justify-center">
+          {/* Zone cliquable : toute la cellule sur mobile, le logo et une marge à partir de md. */}
+          <Wrapper
+            {...link}
+            class="group flex min-h-11 w-full items-center justify-center rounded-sm outline-offset-2 focus-visible:outline-2 focus-visible:outline-lagon md:w-auto md:px-4"
+          >
+            {/* Dans le premier écran : chargement immédiat, mais en priorité basse pour ne
+                jamais concurrencer la photo du hero (élément LCP, en priorité haute). */}
+            <Image
+              src={sponsor.logo}
+              alt={sponsor.nom}
+              width={sponsor.width}
+              height={sponsor.height}
+              widths={sponsor.widths}
+              sizes={sponsor.sizes}
+              loading="eager"
+              fetchpriority="low"
+              class="h-[calc(var(--logo-unit)*var(--logo-h))] w-auto object-contain opacity-75 transition-opacity duration-500 group-hover:opacity-100 group-focus-visible:opacity-100 motion-reduce:transition-none"
+              style={`--logo-h: ${sponsor.h}`}
+            />
+            {url && <span class="sr-only"> (site officiel, nouvel onglet)</span>}
+          </Wrapper>
+        </li>
+      );
+    })}
+  </ul>
+</div>
+
