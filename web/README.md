@@ -44,6 +44,13 @@ npm run preview   # sert le build de production
       défilant, avec des bulles CSS qui se raréfient et une jauge de profondeur 0 → 100 m à droite
       (≥ 1024 px, libellés ≥ 1440 px) ; décoratif, sans effet sans JS, bulles masquées en
       `prefers-reduced-motion`
+- [x] Bande « Partenaires » en bas du hero de l'accueil (`src/components/Sponsors.astro`) : Ball
+      Watch, Beuchat, Sport Pro Group et Pure Ocean, logos ivoire sur fond transparent à la même
+      taille optique, liens vers les sites officiels ; visible sans défiler de 375 × 667 à
+      1440 × 900. Ajouter ou retirer un partenaire : déposer / supprimer son logo dans
+      `src/assets/sponsors/` (PNG ivoire #f4f1ea sur fond transparent, recadré au plus juste) et
+      son entrée dans `src/data/sponsors.ts` (nom, logo, URL, `echelle` optique facultative) ; la
+      rangée est prévue pour quatre logos
 
 ## SEO & performance
 
