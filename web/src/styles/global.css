@@ -17,6 +17,8 @@
   --color-abysse: #101b2c;
   --color-lagon-deep: #3c6e71;
   --color-lagon: #4f8a8d;
+  /* Lagon éclairci, réservé au texte posé sur une photo (≥ 4.5:1 sur le hero, ombre comprise). */
+  --color-lagon-light: #9ccbcd;
   --color-ivory: #f4f1ea;
   --color-muted-1: #b9c2c8;
   --color-muted-2: #8b939a;
