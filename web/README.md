@@ -50,7 +50,11 @@ npm run preview   # sert le build de production
       1440 × 900. Ajouter ou retirer un partenaire : déposer / supprimer son logo dans
       `src/assets/sponsors/` (PNG ivoire #f4f1ea sur fond transparent, recadré au plus juste) et
       son entrée dans `src/data/sponsors.ts` (nom, logo, URL, `echelle` optique facultative) ; la
-      rangée est prévue pour quatre logos
+      rangée est prévue pour quatre logos. Au survol ou au focus clavier (CSS seul) : le logo
+      visé ressort (les autres s'estompent), un reflet découpé par le logo le traverse, un trait
+      lagon et « Site officiel ↗ » apparaissent dessous ; en tactile, le reflet passe une fois
+      sur chaque logo en cascade après l'entrée du hero ; en `prefers-reduced-motion`, ni reflet
+      ni agrandissement, et les changements sont instantanés
 - [x] Globe interactif des expéditions en fin de « Qui suis-je »
       (`src/components/ExpeditionsGlobe.astro` et `.css`, `src/scripts/globe.ts`) : globe 3D en
       points (WebGL, librairie [cobe](https://github.com/shuding/cobe)) et liste des lieux à
