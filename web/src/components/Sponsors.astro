@@ -4,8 +4,11 @@
  * logos ivoire posés sur la photo assombrie, sans cartouche, atténués au repos et à pleine
  * opacité au survol ou au focus, dans quatre cellules identiques sur une rangée. Entre avec le
  * reste du hero (data-hero-item). Liste, liens et réglages : src/data/sponsors.ts.
+ * Survol / focus clavier : le logo visé ressort (les autres s'estompent), un reflet le
+ * traverse, un trait et la mention « Site officiel » apparaissent dessous ; en tactile, le
+ * reflet passe une fois sur chaque logo après l'entrée du hero. Tout est en CSS (plus bas).
  */
-import { Image } from 'astro:assets';
+import { getImage } from 'astro:assets';
 import { sponsors } from '../data/sponsors';
 
 // Côté (px) d'un logo carré à partir de md (--logo-unit, 3.5rem) ; en dessous, 2.25rem pour tenir
@@ -19,20 +22,41 @@ const UNIT_MOBILE = 36;
 // exactement sur l'attribut height : l'image 1x s'affiche pixel pour pixel. Images générées : 1x
 // et 2x des largeurs mobile et desktop (la 2x desktop sert aux écrans 3x en mobile) ; `sizes`
 // laisse le navigateur prendre la plus petite qui suffit.
-const logos = sponsors.map((sponsor) => {
-  const ratio = sponsor.logo.width / sponsor.logo.height;
-  const width = Math.round(UNIT * (sponsor.echelle ?? 1) * Math.sqrt(ratio));
-  const height = Math.round(width / ratio);
-  const mobileWidth = Math.round((width * UNIT_MOBILE) / UNIT);
-  return {
-    ...sponsor,
-    width,
-    height,
-    h: height / UNIT,
-    widths: [mobileWidth, width, 2 * mobileWidth, 2 * width],
-    sizes: `(min-width: 48rem) ${width}px, ${mobileWidth}px`,
-  };
-});
+const logos = await Promise.all(
+  sponsors.map(async (sponsor) => {
+    const ratio = sponsor.logo.width / sponsor.logo.height;
+    const width = Math.round(UNIT * (sponsor.echelle ?? 1) * Math.sqrt(ratio));
+    const height = Math.round(width / ratio);
+    const mobileWidth = Math.round((width * UNIT_MOBILE) / UNIT);
+    // Ce que rendrait <Image> (mêmes options, donc mêmes fichiers), mais avec les URL sous la
+    // main pour le masque du reflet (plus bas). Dans le premier écran : chargement immédiat, mais
+    // en priorité basse pour ne jamais concurrencer la photo du hero (élément LCP, en priorité
+    // haute).
+    const image = await getImage({
+      src: sponsor.logo,
+      alt: sponsor.nom,
+      width,
+      height,
+      widths: [mobileWidth, width, 2 * mobileWidth, 2 * width],
+      sizes: `(min-width: 48rem) ${width}px, ${mobileWidth}px`,
+      loading: 'eager',
+      fetchpriority: 'low',
+    });
+    // Masque du reflet : les mêmes variantes, en image-set() avec leur densité réelle à la taille
+    // affichée (mobile, puis à partir de md). Le navigateur y prend la même image que dans le
+    // srcset, déjà téléchargée : aucun octet de plus.
+    const maskAt = (displayWidth: number) =>
+      `image-set(${image.srcSet.values
+        .map(({ url, transform }) => `url('${url}') ${+((transform.width ?? displayWidth) / displayWidth).toFixed(3)}x`)
+        .join(', ')})`;
+    return {
+      ...sponsor,
+      image,
+      h: height / UNIT,
+      mask: `--mask: ${maskAt(mobileWidth)}; --mask-md: ${maskAt(width)}`,
+    };
+  }),
+);
 ---
 
 <div
@@ -42,31 +66,40 @@ const logos = sponsors.map((sponsor) => {
   {/* Libellé en muted-1 et non en lagon : en bas du hero, le lagon descend sous 4,5:1. */}
   <p class="text-xs font-semibold tracking-widest text-muted-1 uppercase">Partenaires</p>
   {/* Mobile : logos répartis avec des écarts égaux ; à partir de md, quatre cellules identiques. */}
-  <ul class="grid flex-1 grid-cols-[repeat(4,auto)] justify-between md:grid-cols-4">
-    {logos.map(({ url, ...sponsor }) => {
+  <ul class="sponsors grid flex-1 grid-cols-[repeat(4,auto)] justify-between md:grid-cols-4">
+    {logos.map(({ url, image, ...sponsor }, i) => {
       const Wrapper = url ? 'a' : 'div';
       const link = url ? { href: url, target: '_blank', rel: 'noopener noreferrer' } : {};
       return (
-        <li class="flex justify-center">
-          {/* Zone cliquable : toute la cellule sur mobile, le logo et une marge à partir de md. */}
+        <li class="flex justify-center" style={`--i: ${i}`}>
+          {/* Zone cliquable : toute la cellule sur mobile, le logo et une marge à partir de md.
+              Anneau de focus : sur le cadre du logo (voir plus bas). */}
           <Wrapper
             {...link}
-            class="group flex min-h-11 w-full items-center justify-center rounded-sm outline-offset-2 focus-visible:outline-2 focus-visible:outline-lagon md:w-auto md:px-4"
+            class="sponsor flex min-h-11 w-full items-center justify-center focus-visible:outline-none md:w-auto md:px-4"
           >
-            {/* Dans le premier écran : chargement immédiat, mais en priorité basse pour ne
-                jamais concurrencer la photo du hero (élément LCP, en priorité haute). */}
-            <Image
-              src={sponsor.logo}
-              alt={sponsor.nom}
-              width={sponsor.width}
-              height={sponsor.height}
-              widths={sponsor.widths}
-              sizes={sponsor.sizes}
-              loading="eager"
-              fetchpriority="low"
-              class="h-[calc(var(--logo-unit)*var(--logo-h))] w-auto object-contain opacity-75 transition-opacity duration-500 group-hover:opacity-100 group-focus-visible:opacity-100 motion-reduce:transition-none"
-              style={`--logo-h: ${sponsor.h}`}
-            />
+            {/* Cadre aux dimensions exactes du logo : repère de l'anneau de focus, du trait et de
+                la mention. */}
+            <span class="sponsor__frame">
+              <span class="sponsor__logo">
+                <img
+                  src={image.src}
+                  srcset={image.srcSet.attribute}
+                  {...image.attributes}
+                  class="sponsor__img block h-[calc(var(--logo-unit)*var(--logo-h))] w-auto object-contain"
+                  style={`--logo-h: ${sponsor.h}`}
+                />
+                <span class="sponsor__shine" style={sponsor.mask}></span>
+              </span>
+              {url && (
+                <span class="sponsor__label" aria-hidden="true">
+                  Site officiel
+                  <svg viewBox="0 0 12 12" focusable="false">
+                    <path d="M3.5 8.5l5-5M4.5 3.5h4v4" />
+                  </svg>
+                </span>
+              )}
+            </span>
             {url && <span class="sr-only"> (site officiel, nouvel onglet)</span>}
           </Wrapper>
         </li>
@@ -75,3 +108,276 @@ const logos = sponsors.map((sponsor) => {
   </ul>
 </div>
 
+<style>
+  /* Courbe commune (sortie douce, comme le menu mobile) et passage du reflet, à vitesse
+     constante : le début et la fin de sa course sont hors du logo, donc invisibles. */
+  .sponsors {
+    --ease: cubic-bezier(0.16, 1, 0.3, 1);
+    --shine: 1100ms linear;
+  }
+
+  .sponsor__frame {
+    position: relative;
+    display: block;
+    border-radius: 0.125rem;
+  }
+
+  /* Focus clavier : l'anneau lagon du site entoure le logo lui-même, et non toute la cellule
+     (dont le bas couperait la mention). */
+  .sponsor:focus-visible .sponsor__frame {
+    outline: 2px solid var(--color-lagon);
+    outline-offset: 0.375rem;
+  }
+
+  .sponsor__logo {
+    position: relative;
+    display: block;
+    transition: transform 450ms var(--ease);
+  }
+
+  /* Repos : 75 %. Le retour au repos attend un instant, pour que passer d'un logo à l'autre
+     (par l'espace qui les sépare) ne fasse pas remonter les autres entre-temps. */
+  .sponsor__img {
+    opacity: 0.75;
+    transition: opacity 450ms var(--ease) 120ms;
+  }
+
+  /* ---- Logo mis en avant (survol à la souris, focus clavier) et logos estompés ----
+     Survol réservé aux appareils qui en ont un : en tactile, un :hover resté collé après un
+     toucher ne doit rien allumer. :not(…) rend les deux états exclusifs. */
+  .sponsors:has(.sponsor:focus-visible) .sponsor:not(:hover, :focus-visible) .sponsor__img {
+    opacity: 0.35;
+    transition-delay: 0s;
+  }
+
+  .sponsor:focus-visible .sponsor__img {
+    opacity: 1;
+    transition-delay: 0s;
+  }
+
+  .sponsor:focus-visible .sponsor__logo {
+    transform: scale(1.05);
+  }
+
+  @media (hover: hover) {
+    .sponsors:has(.sponsor:hover) .sponsor:not(:hover, :focus-visible) .sponsor__img {
+      opacity: 0.35;
+      transition-delay: 0s;
+    }
+
+    .sponsor:hover .sponsor__img {
+      opacity: 1;
+      transition-delay: 0s;
+    }
+
+    .sponsor:hover .sponsor__logo {
+      transform: scale(1.05);
+    }
+  }
+
+  /* ---- Reflet ----
+     Une bande de lumière inclinée (::before) traverse le logo une fois. Son conteneur est
+     masqué par l'image du logo elle-même : la lumière ne touche que le dessin, jamais le fond.
+     La bande ne bouge que par transform (composité). Sans prise en charge du masque par
+     image-set(), pas de reflet plutôt qu'un rectangle lumineux. */
+  .sponsor__shine {
+    display: none;
+  }
+
+  @supports (mask-image: image-set(url("") 1x)) or (-webkit-mask-image: image-set(url("") 1x)) {
+    .sponsor__shine {
+      position: absolute;
+      inset: 0;
+      display: block;
+      overflow: hidden;
+      pointer-events: none;
+      -webkit-mask-image: var(--mask);
+      mask-image: var(--mask);
+      -webkit-mask-size: 100% 100%;
+      mask-size: 100% 100%;
+      -webkit-mask-repeat: no-repeat;
+      mask-repeat: no-repeat;
+    }
+
+    @media (width >= 48rem) {
+      .sponsor__shine {
+        -webkit-mask-image: var(--mask-md);
+        mask-image: var(--mask-md);
+      }
+    }
+  }
+
+  /* Bande : moitié de la largeur du logo, inclinée de 20° ; elle part entièrement à gauche
+     (-140 % de sa largeur) et sort entièrement à droite (240 %), même pour le logo le plus
+     haut. Sur un logo ivoire à pleine opacité, un blanc seul ne se verrait pas : un cœur blanc
+     entre deux ombres abysse, comme un éclat sur du métal poli. Au repos : invisible, à
+     gauche. En sortie de survol, elle s'efface sur place puis revient à gauche, invisible. */
+  .sponsor__shine::before {
+    content: "";
+    position: absolute;
+    inset-block: 0;
+    left: 0;
+    width: 50%;
+    background: linear-gradient(
+      90deg,
+      transparent 15%,
+      rgb(16 27 44 / 0.36) 38%,
+      #fff 47% 53%,
+      rgb(16 27 44 / 0.36) 62%,
+      transparent 85%
+    );
+    opacity: 0;
+    transform: translateX(-140%) skewX(-20deg);
+    transition:
+      opacity 300ms ease,
+      transform 0s linear 300ms;
+  }
+
+  .sponsor:focus-visible .sponsor__shine::before {
+    opacity: 1;
+    transform: translateX(240%) skewX(-20deg);
+    transition:
+      opacity 0s,
+      transform var(--shine) 60ms;
+  }
+
+  @media (hover: hover) {
+    .sponsor:hover .sponsor__shine::before {
+      opacity: 1;
+      transform: translateX(240%) skewX(-20deg);
+      transition:
+        opacity 0s,
+        transform var(--shine) 60ms;
+    }
+  }
+
+  /* Tactile : le reflet passe une fois sur chaque logo, en cascade, quand la bande achève son
+     entrée (motion.ts pose .motion-ready au départ de l'entrée du hero). */
+  @media (hover: none) {
+    :global(.motion-ready) .sponsor__shine::before {
+      animation: sponsor-shine var(--shine) calc(1200ms + var(--i, 0) * 150ms) backwards;
+    }
+  }
+
+  @keyframes sponsor-shine {
+    from {
+      opacity: 1;
+      transform: translateX(-140%) skewX(-20deg);
+    }
+
+    to {
+      opacity: 1;
+      transform: translateX(240%) skewX(-20deg);
+    }
+  }
+
+  /* ---- Trait et mention « Site officiel » (liens seulement) ----
+     Hors du flux (position absolue) : aucune incidence sur la hauteur de la bande ; jamais
+     cliquables, la zone du lien reste celle du logo. Le trait entre par la gauche et sort par
+     la droite, comme .nav-link ; au focus clavier, le bas de l'anneau en tient lieu. */
+  a.sponsor .sponsor__frame::after {
+    content: "";
+    position: absolute;
+    inset-inline: 0;
+    top: calc(100% + 0.5rem);
+    height: 1px;
+    background-color: var(--color-lagon);
+    pointer-events: none;
+    transform: scaleX(0);
+    transform-origin: right center;
+    transition: transform 400ms cubic-bezier(0.65, 0, 0.35, 1);
+  }
+
+  .sponsor__label {
+    position: absolute;
+    top: calc(100% + 0.875rem);
+    left: 50%;
+    display: flex;
+    align-items: center;
+    gap: 0.3em;
+    font-size: 0.6875rem;
+    font-weight: 600;
+    line-height: 1;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    white-space: nowrap;
+    color: var(--color-muted-1);
+    pointer-events: none;
+    opacity: 0;
+    transform: translate(var(--label-x, -50%), -0.25rem);
+    transition:
+      opacity 200ms ease,
+      transform 300ms var(--ease);
+  }
+
+  .sponsor__label svg {
+    width: 0.8em;
+    height: 0.8em;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.4;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+
+  /* Sous md, la mention du premier et du dernier logo s'aligne sur leur bord extérieur
+     (centrée, elle déborderait de l'écran). */
+  @media (width < 48rem) {
+    li:first-child .sponsor__label {
+      --label-x: 0;
+      left: 0;
+    }
+
+    li:last-child .sponsor__label {
+      --label-x: 0;
+      left: auto;
+      right: 0;
+    }
+  }
+
+  .sponsor:focus-visible .sponsor__label {
+    opacity: 1;
+    transform: translate(var(--label-x, -50%), 0);
+    transition:
+      opacity 350ms ease 120ms,
+      transform 450ms var(--ease) 120ms;
+  }
+
+  @media (hover: hover) {
+    a.sponsor:hover:not(:focus-visible) .sponsor__frame::after {
+      transform: scaleX(1);
+      transform-origin: left center;
+    }
+
+    .sponsor:hover .sponsor__label {
+      opacity: 1;
+      transform: translate(var(--label-x, -50%), 0);
+      transition:
+        opacity 350ms ease 120ms,
+        transform 450ms var(--ease) 120ms;
+    }
+  }
+
+  /* Mouvement réduit : ni reflet, ni agrandissement, ni glissement ; l'opacité change, le
+     trait et la mention apparaissent d'un coup. */
+  @media (prefers-reduced-motion: reduce) {
+    .sponsor__shine {
+      display: none;
+    }
+
+    .sponsor__img,
+    .sponsor__logo,
+    .sponsor__label,
+    a.sponsor .sponsor__frame::after {
+      transition: none !important;
+    }
+
+    .sponsor__logo {
+      transform: none !important;
+    }
+
+    .sponsor__label {
+      transform: translate(var(--label-x, -50%), 0) !important;
+    }
+  }
+</style>
