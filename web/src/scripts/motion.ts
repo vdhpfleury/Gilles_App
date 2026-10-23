@@ -333,8 +333,9 @@ function init() {
         // Parallax is decorative: if its chunk fails to load, the page simply stays still.
       });
       initDepthPhotos();
-      initGlobes();
     });
+    // Its own task: an exception in the effects above must not keep the globe from loading.
+    nextTask(initGlobes);
   });
 }
 

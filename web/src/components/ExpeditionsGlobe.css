@@ -377,9 +377,9 @@ html:not(.js) .globe-layout,
   line-height: 1.625;
 }
 
-/* Sans JavaScript (ou module du globe injoignable), toutes les fiches se lisent à la suite ;
-   avec JavaScript, seule celle du lieu sélectionné est affichée (avec une invitation tant que
-   rien n'est choisi). */
+/* Tant que globe.ts n'a pas pris la main (sans JavaScript, module pas encore chargé ou
+   injoignable), toutes les fiches se lisent à la suite ; ensuite ([data-globe-live]), seule
+   celle du lieu sélectionné est affichée (avec une invitation tant que rien n'est choisi). */
 .globe-placeholder {
   display: none;
   color: var(--color-muted-2, #8b939a);
@@ -392,21 +392,21 @@ html:not(.js) .globe-layout,
   border-top: 1px solid rgb(255 255 255 / 0.08);
 }
 
-.js [data-globe]:not([data-globe-state='failed']) .globe-placeholder:not([hidden]) {
+[data-globe][data-globe-live] .globe-placeholder:not([hidden]) {
   display: block;
 }
 
-.js [data-globe]:not([data-globe-state='failed']) .globe-detail__item {
+[data-globe][data-globe-live] .globe-detail__item {
   margin: 0;
   padding: 0;
   border: 0;
 }
 
-.js [data-globe]:not([data-globe-state='failed']) .globe-detail__item:not([data-active]) {
+[data-globe][data-globe-live] .globe-detail__item:not([data-active]) {
   display: none;
 }
 
-.js [data-globe]:not([data-globe-state='failed']) .globe-detail__item[data-active] {
+[data-globe][data-globe-live] .globe-detail__item[data-active] {
   animation: globe-fade 450ms ease both;
 }
 
@@ -430,7 +430,7 @@ html:not(.js) .globe-layout,
   }
 
   .globe-halo[data-active]::after,
-  .js [data-globe]:not([data-globe-state='failed']) .globe-detail__item[data-active] {
+  [data-globe][data-globe-live] .globe-detail__item[data-active] {
     animation: none;
   }
 }
