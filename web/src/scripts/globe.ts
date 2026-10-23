@@ -11,9 +11,11 @@ import type { Globe, Marker } from 'cobe';
  * Boutons, halos et fiches sont associés par leur ordre dans le DOM (même ordre de rendu).
  * - [data-globe-placeholder] invitation affichée tant que rien n'est sélectionné
  *
- * La liste fonctionne seule (sans WebGL, ou avant le chargement du globe). Le globe n'est
- * chargé (import dynamique de cobe) qu'à l'approche de la section, ne tourne que lorsqu'elle
- * est à l'écran et l'onglet actif, et est détruit au pagehide.
+ * Ce module est lui-même chargé à la demande par motion.ts, à l'approche de la section.
+ * Tant que ce module n'est pas chargé, toutes les fiches restent affichées ; une fois chargé, la
+ * liste fonctionne seule (même sans WebGL). Le globe n'est chargé (import dynamique de cobe)
+ * qu'à l'approche du globe, ne tourne que lorsqu'il est à
+ * l'écran et l'onglet actif, et est détruit au pagehide.
  */
 
 type RGB = [number, number, number];
@@ -159,6 +161,9 @@ export function initExpeditionsGlobe(root: HTMLElement) {
   places.forEach((place, i) => {
     place.button.addEventListener('click', () => select(i));
   });
+  // La liste est désormais interactive : le CSS peut n'afficher que la fiche choisie. Avant ce
+  // point (module pas encore chargé, ou jamais), toutes les fiches restent lisibles.
+  root.setAttribute('data-globe-live', '');
 
   // --- Globe (chargé à la demande) ---------------------------------------------------------
   if (!stage || !canvas) return;

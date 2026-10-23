@@ -8,6 +8,7 @@ import { gsap } from 'gsap';
  *   viewport. Needs data-depth-src (depth map URL, near = white); options: data-depth-bubbles,
  *   data-depth-caustics="0..1" (default 0.6; the hero uses 1). The <img> inside stays the fallback.
  * - [data-reveal]: fade + slide-up the first time a block enters the viewport
+ * - [data-globe]: expeditions globe (ExpeditionsGlobe.astro), code fetched as it nears the viewport
  * - [data-tilt]: pointer-following 3D tilt (mouse only)
  * - [data-magnetic]: cursor-attracted buttons/links (mouse only)
  * With prefers-reduced-motion, everything is shown at once and nothing moves.
@@ -264,6 +265,45 @@ function initDepthPhotos() {
   });
 }
 
+/**
+ * Expeditions globe (ExpeditionsGlobe.astro): globe.ts (list, cards and globe) is only fetched
+ * once the section is within a quarter of a screen of the viewport, and it loads the cobe WebGL
+ * library itself, so no globe code is downloaded at first paint (the section sits further down).
+ * Loaded from here rather than from a <script> in the component: with a single entry script
+ * using dynamic imports, Vite keeps its preload helper inlined in it instead of splitting it into
+ * a shared chunk requested by every page. Runs with reduced motion too (globe.ts then never
+ * auto-rotates).
+ */
+function initGlobes() {
+  const roots = document.querySelectorAll<HTMLElement>('[data-globe]');
+  if (!roots.length) return;
+
+  const load = (root: HTMLElement) => {
+    import('./globe')
+      .then(({ initExpeditionsGlobe }) => initExpeditionsGlobe(root))
+      .catch(() => {
+        // Chunk unreachable (or init error): every place card is shown, as without JavaScript.
+        root.dataset.globeState = 'failed';
+      });
+  };
+
+  if (!('IntersectionObserver' in window)) {
+    roots.forEach(load);
+    return;
+  }
+  const observer = new IntersectionObserver(
+    (entries) => {
+      for (const entry of entries) {
+        if (!entry.isIntersecting) continue;
+        observer.unobserve(entry.target);
+        load(entry.target as HTMLElement);
+      }
+    },
+    { rootMargin: '25% 0px' },
+  );
+  roots.forEach((root) => observer.observe(root));
+}
+
 /** Tilt and magnetic effects (mouse only): nothing runs until the pointer first enters. */
 function initPointerEffects() {
   if (reduceMotion || !finePointer) return;
@@ -294,6 +334,8 @@ function init() {
       });
       initDepthPhotos();
     });
+    // Its own task: an exception in the effects above must not keep the globe from loading.
+    nextTask(initGlobes);
   });
 }
 

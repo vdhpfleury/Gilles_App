@@ -24,7 +24,7 @@ export interface Sponsor {
 
 export const sponsors: Sponsor[] = [
   { nom: 'Ball Watch', logo: ballWatch, url: 'https://www.ballwatch.com/en/', echelle: 1.11 },
-  { nom: 'Beuchat', logo: beuchat, url: 'https://www.beuchat-diving.com/fr/', echelle: 0.9 },
+  { nom: 'Beuchat', logo: beuchat, url: 'https://www.beuchat-sports.com/fr/', echelle: 0.9 },
   { nom: 'Sport Pro Group', logo: sportProGroup, url: 'https://www.sportprogroup.fr/', echelle: 0.95 },
   { nom: 'Pure Ocean', logo: pureOcean, url: 'https://www.pure-ocean.org/', echelle: 1.05 },
 ];

@@ -4,8 +4,11 @@
  * logos ivoire posés sur la photo assombrie, sans cartouche, atténués au repos et à pleine
  * opacité au survol ou au focus, dans quatre cellules identiques sur une rangée. Entre avec le
  * reste du hero (data-hero-item). Liste, liens et réglages : src/data/sponsors.ts.
+ * Survol / focus clavier : le logo visé ressort (les autres s'estompent), un reflet le
+ * traverse, un trait et la mention « Site officiel » apparaissent dessous ; en tactile, le
+ * reflet passe une fois sur chaque logo après l'entrée du hero. Tout est en CSS (plus bas).
  */
-import { Image } from 'astro:assets';
+import { getImage } from 'astro:assets';
 import { sponsors } from '../data/sponsors';
 
 // Côté (px) d'un logo carré à partir de md (--logo-unit, 3.5rem) ; en dessous, 2.25rem pour tenir
@@ -19,20 +22,41 @@ const UNIT_MOBILE = 36;
 // exactement sur l'attribut height : l'image 1x s'affiche pixel pour pixel. Images générées : 1x
 // et 2x des largeurs mobile et desktop (la 2x desktop sert aux écrans 3x en mobile) ; `sizes`
 // laisse le navigateur prendre la plus petite qui suffit.
-const logos = sponsors.map((sponsor) => {
-  const ratio = sponsor.logo.width / sponsor.logo.height;
-  const width = Math.round(UNIT * (sponsor.echelle ?? 1) * Math.sqrt(ratio));
-  const height = Math.round(width / ratio);
-  const mobileWidth = Math.round((width * UNIT_MOBILE) / UNIT);
-  return {
-    ...sponsor,
-    width,
-    height,
-    h: height / UNIT,
-    widths: [mobileWidth, width, 2 * mobileWidth, 2 * width],
-    sizes: `(min-width: 48rem) ${width}px, ${mobileWidth}px`,
-  };
-});
+const logos = await Promise.all(
+  sponsors.map(async (sponsor) => {
+    const ratio = sponsor.logo.width / sponsor.logo.height;
+    const width = Math.round(UNIT * (sponsor.echelle ?? 1) * Math.sqrt(ratio));
+    const height = Math.round(width / ratio);
+    const mobileWidth = Math.round((width * UNIT_MOBILE) / UNIT);
+    // Ce que rendrait <Image> (mêmes options, donc mêmes fichiers), mais avec les URL sous la
+    // main pour le masque du reflet (plus bas). Dans le premier écran : chargement immédiat, mais
+    // en priorité basse pour ne jamais concurrencer la photo du hero (élément LCP, en priorité
+    // haute).
+    const image = await getImage({
+      src: sponsor.logo,
+      alt: sponsor.nom,
+      width,
+      height,
+      widths: [mobileWidth, width, 2 * mobileWidth, 2 * width],
+      sizes: `(min-width: 48rem) ${width}px, ${mobileWidth}px`,
+      loading: 'eager',
+      fetchpriority: 'low',
+    });
+    // Masque du reflet : les mêmes variantes, en image-set() avec leur densité réelle à la taille
+    // affichée (mobile, puis à partir de md). Le navigateur y prend la même image que dans le
+    // srcset, déjà téléchargée : aucun octet de plus.
+    const maskAt = (displayWidth: number) =>
+      `image-set(${image.srcSet.values
+        .map(({ url, transform }) => `url('${url}') ${+((transform.width ?? displayWidth) / displayWidth).toFixed(3)}x`)
+        .join(', ')})`;
+    return {
+      ...sponsor,
+      image,
+      h: height / UNIT,
+      mask: `--mask: ${maskAt(mobileWidth)}; --mask-md: ${maskAt(width)}`,
+    };
+  }),
+);
 ---
 
 <div
@@ -42,31 +66,40 @@ const logos = sponsors.map((sponsor) => {
   {/* Libellé en muted-1 et non en lagon : en bas du hero, le lagon descend sous 4,5:1. */}
   <p class="text-xs font-semibold tracking-widest text-muted-1 uppercase">Partenaires</p>
   {/* Mobile : logos répartis avec des écarts égaux ; à partir de md, quatre cellules identiques. */}
-  <ul class="grid flex-1 grid-cols-[repeat(4,auto)] justify-between md:grid-cols-4">
-    {logos.map(({ url, ...sponsor }) => {
+  <ul class="sponsors grid flex-1 grid-cols-[repeat(4,auto)] justify-between md:grid-cols-4">
+    {logos.map(({ url, image, ...sponsor }, i) => {
       const Wrapper = url ? 'a' : 'div';
       const link = url ? { href: url, target: '_blank', rel: 'noopener noreferrer' } : {};
       return (
-        <li class="flex justify-center">
-          {/* Zone cliquable : toute la cellule sur mobile, le logo et une marge à partir de md. */}
+        <li class="flex justify-center" style={`--i: ${i}`}>
+          {/* Zone cliquable : toute la cellule sur mobile, le logo et une marge à partir de md.
+              Anneau de focus : sur le cadre du logo (voir plus bas). */}
           <Wrapper
             {...link}
-            class="group flex min-h-11 w-full items-center justify-center rounded-sm outline-offset-2 focus-visible:outline-2 focus-visible:outline-lagon md:w-auto md:px-4"
+            class="sponsor flex min-h-11 w-full items-center justify-center focus-visible:outline-none md:w-auto md:px-4"
           >
-            {/* Dans le premier écran : chargement immédiat, mais en priorité basse pour ne
-                jamais concurrencer la photo du hero (élément LCP, en priorité haute). */}
-            <Image
-              src={sponsor.logo}
-              alt={sponsor.nom}
-              width={sponsor.width}
-              height={sponsor.height}
-              widths={sponsor.widths}
-              sizes={sponsor.sizes}
-              loading="eager"
-              fetchpriority="low"
-              class="h-[calc(var(--logo-unit)*var(--logo-h))] w-auto object-contain opacity-75 transition-opacity duration-500 group-hover:opacity-100 group-focus-visible:opacity-100 motion-reduce:transition-none"
-              style={`--logo-h: ${sponsor.h}`}
-            />
+            {/* Cadre aux dimensions exactes du logo : repère de l'anneau de focus, du trait et de
+                la mention. */}
+            <span class="sponsor__frame">
+              <span class="sponsor__logo">
+                <img
+                  src={image.src}
+                  srcset={image.srcSet.attribute}
+                  {...image.attributes}
+                  class="sponsor__img block h-[calc(var(--logo-unit)*var(--logo-h))] w-auto object-contain"
+                  style={`--logo-h: ${sponsor.h}`}
+                />
+                <span class="sponsor__shine" style={sponsor.mask}></span>
+              </span>
+              {url && (
+                <span class="sponsor__label" aria-hidden="true">
+                  Site officiel
+                  <svg viewBox="0 0 12 12" focusable="false">
+                    <path d="M3.5 8.5l5-5M4.5 3.5h4v4" />
+                  </svg>
+                </span>
+              )}
+            </span>
             {url && <span class="sr-only"> (site officiel, nouvel onglet)</span>}
           </Wrapper>
         </li>
@@ -74,4 +107,3 @@ const logos = sponsors.map((sponsor) => {
     })}
   </ul>
 </div>
-

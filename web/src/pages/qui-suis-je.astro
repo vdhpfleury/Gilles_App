@@ -1,16 +1,10 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
 import DepthBanner from '../components/DepthBanner.astro';
+import ExpeditionsGlobe from '../components/ExpeditionsGlobe.astro';
 import { Image } from 'astro:assets';
 import portrait from '../assets/images/portrait.jpg';
 import headerImage from '../assets/images/qui-suis-je-header.jpg';
-
-// Globe des expéditions : fonctionnalité en réserve (voir README). Import dynamique sous
-// condition : avec le flag désactivé, ni le script ni le CSS du composant ne sont émis.
-const ExpeditionsGlobe =
-  import.meta.env.PUBLIC_ENABLE_GLOBE === 'true'
-    ? (await import('../components/ExpeditionsGlobe.astro')).default
-    : null;
 ---
 
 <BaseLayout title="Qui suis-je ?" description="Apnéiste professionnel, biologiste marin, plongeur scientifique et astronaute analogue.">
@@ -87,5 +81,6 @@ const ExpeditionsGlobe =
     </div>
   </section>
 
-  {ExpeditionsGlobe && <ExpeditionsGlobe />}
+  {/* Globe des expéditions : lieux et fiches dans src/data/expeditions.ts. */}
+  <ExpeditionsGlobe />
 </BaseLayout>

@@ -38,7 +38,7 @@ npm run preview   # sert le build de production
       cartes et boutons "magnétiques" à la souris, soulignement animé de la navigation ;
       `prefers-reduced-motion` respecté, contenu lisible sans JavaScript. Menu mobile
       accessible et liens Facebook/Instagram/LinkedIn dans le hero, sur Contact et en pied de page
-- [x] « Photo en relief » WebGL (desktop, `src/scripts/hero3d.ts`) réutilisable via `data-depth-photo` + `data-depth-src` (option `data-depth-bubbles`, `data-depth-caustics`) : hero, bandeaux de « Qui suis-je » et du stage sous glace ; cartes de profondeur `public/3d/*-depth.webp` (blanc = proche) livrées déjà floutées (Gaussien σ = 12 px sur 1200 px de large) ; globe des expéditions affiché en fin de « Qui suis-je » si `PUBLIC_ENABLE_GLOBE=true`
+- [x] « Photo en relief » WebGL (desktop, `src/scripts/hero3d.ts`) réutilisable via `data-depth-photo` + `data-depth-src` (option `data-depth-bubbles`, `data-depth-caustics`) : hero, bandeaux de « Qui suis-je » et du stage sous glace ; cartes de profondeur `public/3d/*-depth.webp` (blanc = proche) livrées déjà floutées (Gaussien σ = 12 px sur 1200 px de large)
 - [x] « La descente » sur l'accueil (`src/scripts/descent.ts`, `src/components/DepthGauge.astro`) :
       sous le hero, l'eau passe du bleu de surface (#0c2f4a, contraste AA vérifié) à l'encre en
       défilant, avec des bulles CSS qui se raréfient et une jauge de profondeur 0 → 100 m à droite
@@ -50,7 +50,25 @@ npm run preview   # sert le build de production
       1440 × 900. Ajouter ou retirer un partenaire : déposer / supprimer son logo dans
       `src/assets/sponsors/` (PNG ivoire #f4f1ea sur fond transparent, recadré au plus juste) et
       son entrée dans `src/data/sponsors.ts` (nom, logo, URL, `echelle` optique facultative) ; la
-      rangée est prévue pour quatre logos
+      rangée est prévue pour quatre logos. Au survol ou au focus clavier (CSS seul) : le logo
+      visé ressort (les autres s'estompent), un reflet découpé par le logo le traverse, un trait
+      lagon et « Site officiel ↗ » apparaissent dessous ; en tactile, le reflet passe une fois
+      sur chaque logo en cascade après l'entrée du hero ; en `prefers-reduced-motion`, ni reflet
+      ni agrandissement, et les changements sont instantanés
+- [x] Globe interactif des expéditions en fin de « Qui suis-je »
+      (`src/components/ExpeditionsGlobe.astro` et `.css`, `src/scripts/globe.ts`) : globe 3D en
+      points (WebGL, librairie [cobe](https://github.com/shuding/cobe)) et liste des lieux à
+      côté ; choisir un lieu fait tourner le globe vers lui et affiche sa fiche. Aucun
+      JavaScript du globe au premier affichage : `motion.ts` ne télécharge `globe.ts` (~2,4 Ko
+      gzip), puis cobe (~6 Ko gzip), qu'à l'approche de la section. Liste utilisable au clavier,
+      fiches lisibles sans JavaScript ni WebGL, pas de rotation automatique en
+      `prefers-reduced-motion`. Ajouter ou modifier un lieu : une entrée dans
+      `src/data/expeditions.ts` (mode d'emploi en tête du fichier) —
+      `lieu`, `region`, `lat`/`lng` en degrés décimaux (nord et est positifs, sud et ouest
+      négatifs), `titre`, `description`, `type` (`expedition`, `stage`, `mission` ou `recherche`)
+      et `periode` facultative (la ligne « Période » de la fiche n'apparaît que si elle est
+      renseignée). Les lieux actuels sont ceux déjà cités sur le site, aux coordonnées
+      approximatives : à compléter avec Gilles (lieux précis, dates, missions ESA)
 
 ## SEO & performance
 
@@ -73,7 +91,8 @@ npm run preview   # sert le build de production
   canoniques et les balises Open Graph).
 - Audits Lighthouse (build de prod, en local, mobile), avec le motion design : Accueil
   99/100/100/100, Services 100/100/100/100, Mentoring 95-97/100/100/100, détail de stage
-  94/100/100/100, Contact 100/100/100/100 (Performance/Accessibilité/Bonnes pratiques/SEO).
+  94/100/100/100, Contact 100/100/100/100, Qui suis-je (avec le globe) 99/100/100/100
+  (Performance/Accessibilité/Bonnes pratiques/SEO).
 
 ## Formulaire de contact
 
@@ -97,40 +116,6 @@ que Gilles puisse éditer services, stages, tarifs et textes sans toucher au cod
   Vercel, il faudra remplacer ce backend par `github` + un fournisseur OAuth dédié.
 - Test en local : `npm run cms` (lance `decap-server`) puis ouvrir `/admin` en même temps que
   `npm run dev`.
-
-## Fonctionnalités en réserve
-
-Fonctionnalités entièrement codées mais **désactivées par défaut**, pour pouvoir les montrer
-rapidement à Gilles sans qu'elles apparaissent sur le site de production.
-
-### Globe interactif des expéditions
-
-Globe 3D en points (WebGL, librairie [cobe](https://github.com/shuding/cobe), ~6 Ko gzip chargés
-seulement quand la section arrive à l'écran) avec les lieux d'expédition et de stage ; une liste
-accessible à côté du globe fait tourner celui-ci vers le lieu choisi et affiche sa fiche.
-Fichiers : `src/components/ExpeditionsGlobe.astro` (+ `.css`), `src/scripts/globe.ts`,
-`src/data/expeditions.ts`, page de démo `src/pages/labo/[demo].astro`.
-
-- **Flag** : `PUBLIC_ENABLE_GLOBE` (voir `.env.example`). Sans `PUBLIC_ENABLE_GLOBE=true`, le
-  build ne contient ni la page `/labo/globe/`, ni le JavaScript/CSS du globe, ni d'entrée dans le
-  sitemap (`/labo/` en est de toute façon exclu, et la page de démo est en `noindex`).
-- **Démo en local** : `PUBLIC_ENABLE_GLOBE=true npm run dev` puis ouvrir
-  http://localhost:4321/labo/globe
-- **Démo en ligne pour le client** : sur Netlify, Site configuration → Environment variables,
-  ajouter `PUBLIC_ENABLE_GLOBE` = `true` **uniquement pour les contextes « Deploy Previews » et/ou
-  « Branch deploys »** (jamais « Production »), puis partager l'URL de la preview + `/labo/globe/`.
-- **Intégration future dans « Qui suis-je »** : afficher le composant dans
-  `src/pages/qui-suis-je.astro` derrière le flag, en une ligne :
-  `{import.meta.env.PUBLIC_ENABLE_GLOBE === 'true' && <ExpeditionsGlobe />}`.
-  Attention : un `import` statique du composant suffit à embarquer son script et son CSS dans le
-  build même flag désactivé ; tant que le flag existe, l'importer comme dans la page de démo
-  (`const ExpeditionsGlobe = import.meta.env.PUBLIC_ENABLE_GLOBE === 'true' ? (await
-  import('../components/ExpeditionsGlobe.astro')).default : null;`). Une fois validé, retirer la
-  condition, le flag et la page `/labo`.
-- **Données à compléter avec Gilles** : `src/data/expeditions.ts` ne contient pour l'instant que
-  les lieux déjà cités sur le site (Groenland, Nice/Méditerranée, Caraïbes, stages sous glace),
-  avec des coordonnées approximatives, des périodes `[À compléter]` et un badge « à confirmer ».
-  À remplacer par les vrais lieux, dates et missions (dont les missions ESA).
 
 ## Déploiement
 
